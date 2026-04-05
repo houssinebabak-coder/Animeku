@@ -413,7 +413,7 @@ img{display:block}
 <div class="footer">© 2026 AnimeKu — جميع الحقوق محفوظة</div>
 
 <script>
-const PASS='admin123';
+const PASS='ta!R0VadineresTex?PRL!ldr6';
 let db=JSON.parse(localStorage.getItem('animeku_db')||'{"anime":[],"episodes":[]}');
 function save(){localStorage.setItem('animeku_db',JSON.stringify(db))}
 
@@ -426,6 +426,12 @@ function showPage(n){
 }
 function gotoHome(){showPage('home');renderHome();}
 function gotoBrowse(){showPage('browse');renderBrowse(db.anime,'كل الأنمي');}
+
+// SECRET URL: animeku.vercel.app/#admin-secret
+if(window.location.hash === '#admin-secret') {
+  window.location.hash = '';
+  setTimeout(() => { showPage('admin'); renderAdmin(); }, 100);
+}
 
 // HERO
 function renderHome(){
