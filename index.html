@@ -410,7 +410,7 @@ img{display:block}
   </div>
 </div>
 
-<div class="footer">© 2025 AnimeKu — جميع الحقوق محفوظة</div>
+<div class="footer">© 2026 AnimeKu — جميع الحقوق محفوظة</div>
 
 <script>
 const PASS='admin123';
@@ -641,7 +641,7 @@ renderHome();
 
 // KEYBOARD SHORTCUT: Ctrl + Shift + A
 document.addEventListener('keydown', function(e) {
-  if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+  if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a' || e.code === 'KeyA')) {
     e.preventDefault();
     showPage('admin-login');
   }
