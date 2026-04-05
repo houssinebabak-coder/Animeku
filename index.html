@@ -31,6 +31,14 @@ img{display:block}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:99px}
 
+/* LOADING SCREEN */
+#loading-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+#loading-screen .llogo{font-size:36px;font-weight:800;color:#fff}
+#loading-screen .llogo span{color:var(--primary2)}
+.spinner{width:36px;height:36px;border:3px solid var(--surface2);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading-screen p{font-size:13px;color:var(--muted)}
+
 /* NAV */
 .nav{display:flex;align-items:center;gap:16px;padding:0 24px;height:64px;background:rgba(15,15,19,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:300}
 .logo{font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px;cursor:pointer;flex-shrink:0}
@@ -211,12 +219,25 @@ img{display:block}
 .empty{grid-column:1/-1;text-align:center;padding:52px 20px;color:var(--muted)}
 .empty .ei{font-size:44px;margin-bottom:10px}
 .empty p{font-size:14px}
+
+/* SAVING INDICATOR */
+#save-indicator{position:fixed;bottom:20px;left:20px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:8px 16px;font-size:12px;color:var(--muted);display:none;align-items:center;gap:8px;z-index:999}
+#save-indicator.show{display:flex}
+#save-indicator.ok{color:#00d46a;border-color:rgba(0,212,106,.3)}
+#save-indicator.err{color:#ff7878;border-color:rgba(255,70,70,.3)}
 </style>
 </head>
 <body>
 
+<!-- LOADING -->
+<div id="loading-screen">
+  <div class="llogo">Anime<span>Ku</span></div>
+  <div class="spinner"></div>
+  <p>جاري تحميل البيانات...</p>
+</div>
+
 <nav class="nav">
-  <div class="logo" onclick="gotoHome()">Anime<span>Ku</span></div>
+  <div class="logo" onclick="secretClick()">Anime<span>Ku</span></div>
   <div class="nav-search">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <input type="text" id="search-input" placeholder="ابحث عن أنمي..." oninput="handleSearch(this.value)">
@@ -345,7 +366,11 @@ img{display:block}
       </div>
       <div class="fg"><label>الوصف</label><textarea id="a-desc" placeholder="اكتب وصف الأنمي..."></textarea></div>
       <div class="fg">
-        <label>صورة الغلاف</label>
+        <label>رابط صورة الغلاف (URL)</label>
+        <input type="text" id="a-imgurl" placeholder="https://example.com/image.jpg">
+        <div style="font-size:11px;color:var(--muted);margin-top:5px">ضع رابط صورة من الإنترنت مباشرة</div>
+      </div>
+      <div class="fg"><label>أو أدخل رابط صورة مباشر</label>
         <div class="upzone" id="upzone" onclick="document.getElementById('a-img').click()" ondragover="event.preventDefault();this.style.borderColor='var(--primary)'" ondragleave="this.style.borderColor='var(--border)'" ondrop="onDrop(event)">
           <div class="uicon">🖼️</div>
           <p>اضغط لاختيار صورة أو اسحبها هنا</p>
@@ -369,8 +394,8 @@ img{display:block}
       <div class="fg"><label>عنوان الحلقة</label><input type="text" id="ep-t" placeholder="البداية"></div>
       <div class="fg">
         <label>رابط الفيديو</label>
-        <input type="text" id="ep-u" placeholder="https://www.youtube.com/embed/XXX أو https://streamable.com/e/XXX">
-        <div style="font-size:11px;color:var(--muted);margin-top:5px">يوتيوب: افتح الفيديو ← مشاركة ← تضمين ← انسخ رابط src • Streamable: streamable.com/e/XXXXX</div>
+        <input type="text" id="ep-u" placeholder="https://www.youtube.com/embed/XXX">
+        <div style="font-size:11px;color:var(--muted);margin-top:5px">يوتيوب: افتح الفيديو ← مشاركة ← تضمين ← انسخ رابط src</div>
       </div>
       <button class="btn-p" style="border-radius:10px" onclick="addEp()">🎬 إضافة الحلقة</button>
     </div>
@@ -380,11 +405,9 @@ img{display:block}
         <button class="mstab active" onclick="swManage('anime',this)">🎬 إدارة الأنمي</button>
         <button class="mstab" onclick="swManage('eps',this)">📺 إدارة الحلقات</button>
       </div>
-      <!-- anime list -->
       <div id="manage-anime">
         <div class="mlist" id="mlist"></div>
       </div>
-      <!-- episodes list -->
       <div id="manage-eps" style="display:none">
         <div class="fg">
           <label>اختر الأنمي</label>
@@ -410,251 +433,391 @@ img{display:block}
   </div>
 </div>
 
-<div class="footer">© 2026 AnimeKu — جميع الحقوق محفوظة</div>
+<div id="save-indicator">⏳ جاري الحفظ...</div>
+<div class="footer">© 2025 AnimeKu — جميع الحقوق محفوظة</div>
 
-<script>
-const PASS='ta!R0VadineresTex?PRL!ldr6';
-  const GITHUB_TOKEN='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';
-const GITHUB_REPO='houssinebabak-coder/Animeku';
-const GITHUB_FILE='data.json';
-let db=JSON.parse(localStorage.getItem('animeku_db')||'{"anime":[],"episodes":[]}');
-function save(){localStorage.setItem('animeku_db',JSON.stringify(db))}
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  setDoc,
+  deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-function showPage(n){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+n).classList.add('active');
-  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('act'));
-  const nl=document.getElementById('nl-'+n);if(nl)nl.classList.add('act');
-  window.scrollTo(0,0);
+// ====== CONFIG ======
+const firebaseConfig = {
+  apiKey: "AIzaSyBF8vTJtFXq_sfYVmg8-fwj4dReRTe8iwM",
+  authDomain: "animeku-96667.firebaseapp.com",
+  projectId: "animeku-96667",
+  storageBucket: "animeku-96667.firebasestorage.app",
+  messagingSenderId: "61899898827",
+  appId: "1:61899898827:web:214ce9ca7f18e85df9f48e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db_fire = getFirestore(app);
+
+// ====== LOCAL STATE ======
+const PASS = 'admin123';
+let db = { anime: [], episodes: [] };
+
+// ====== SAVE INDICATOR ======
+function showSave(state, msg) {
+  const el = document.getElementById('save-indicator');
+  el.className = 'show ' + (state || '');
+  el.textContent = msg || '⏳ جاري الحفظ...';
+  if (state === 'ok') setTimeout(() => el.className = '', 2000);
 }
-function gotoHome(){showPage('home');renderHome();}
-function gotoBrowse(){showPage('browse');renderBrowse(db.anime,'كل الأنمي');}
 
-// SECRET URL: animeku.vercel.app/#admin-secret
-if(window.location.hash === '#admin-secret') {
-  window.location.hash = '';
-  setTimeout(() => { showPage('admin'); renderAdmin(); }, 100);
-}
-
-// HERO
-function renderHome(){
-  renderGrid('home-grid',[...db.anime].reverse().slice(0,12));
-  renderTop();
-  if(!db.anime.length)return;
-  const a=db.anime[db.anime.length-1];
-  document.getElementById('htitle').textContent=a.nameAr||a.nameEn;
-  document.getElementById('hbadge').textContent='🔥 '+a.genre;
-  document.getElementById('hmeta').innerHTML=`<span>⭐ ${a.rating||'—'}</span><span class="dot"></span><span>${a.year||''}</span><span class="dot"></span><span>${a.status||''}</span>`;
-  document.getElementById('hdesc').textContent=a.desc||'';
-  const eps=db.episodes.filter(e=>e.animeId===a.id).length;
-  document.getElementById('hbtns').innerHTML=`${eps?`<button class="btn-p" onclick="showAnime('${a.id}')">▶ شاهد الآن</button>`:''}<button class="btn-g" onclick="gotoBrowse()">تصفح الكل</button>`;
-  if(a.img){
-    const bi=document.getElementById('hbg');bi.src=a.img;bi.style.display='block';
-    const pi=document.getElementById('hpi');pi.src=a.img;pi.style.display='block';
-    document.getElementById('hph').style.display='none';
-  }else{
-    document.getElementById('hbg').style.display='none';
-    document.getElementById('hpi').style.display='none';
-    const ph=document.getElementById('hph');ph.style.display='flex';ph.textContent=a.emoji||'🎌';
+// ====== FIREBASE SAVE ======
+async function saveAnime(anime) {
+  showSave('', '⏳ جاري الحفظ...');
+  try {
+    await setDoc(doc(db_fire, 'anime', anime.id), anime);
+    showSave('ok', '✅ تم الحفظ');
+  } catch (e) {
+    showSave('err', '❌ خطأ في الحفظ');
+    console.error(e);
   }
 }
 
-function renderTop(){
-  const el=document.getElementById('top-list');
-  const sorted=[...db.anime].sort((a,b)=>(parseFloat(b.rating)||0)-(parseFloat(a.rating)||0)).slice(0,6);
-  if(!sorted.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:6px 0">لا يوجد أنمي بعد</div>';return;}
-  el.innerHTML=sorted.map(a=>`<div class="top-item" onclick="showAnime('${a.id}')">
-    <div class="top-th">${a.img?`<img src="${a.img}" alt="">`:`<div class="top-ph">${a.emoji||'🎌'}</div>`}</div>
-    <div><div class="top-name">${a.nameAr||a.nameEn}</div><div class="top-meta">⭐ ${a.rating||'—'} • ${a.genre||''}</div></div>
+async function saveEpisode(ep) {
+  showSave('', '⏳ جاري الحفظ...');
+  try {
+    await setDoc(doc(db_fire, 'episodes', ep.id), ep);
+    showSave('ok', '✅ تم الحفظ');
+  } catch (e) {
+    showSave('err', '❌ خطأ في الحفظ');
+    console.error(e);
+  }
+}
+
+async function deleteAnimeDoc(id) {
+  try { await deleteDoc(doc(db_fire, 'anime', id)); } catch(e){ console.error(e); }
+}
+
+async function deleteEpisodeDoc(id) {
+  try { await deleteDoc(doc(db_fire, 'episodes', id)); } catch(e){ console.error(e); }
+}
+
+// ====== LOAD FROM FIREBASE ======
+async function loadFromFirebase() {
+  try {
+    const [animeSnap, epsSnap] = await Promise.all([
+      getDocs(collection(db_fire, 'anime')),
+      getDocs(collection(db_fire, 'episodes'))
+    ]);
+    db.anime = animeSnap.docs.map(d => d.data());
+    db.episodes = epsSnap.docs.map(d => d.data());
+    db.anime.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+  } catch (e) {
+    console.error('Firebase load error:', e);
+  }
+  document.getElementById('loading-screen').style.display = 'none';
+  renderHome();
+}
+
+// ====== PAGES ======
+function showPage(n) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + n).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('act'));
+  const nl = document.getElementById('nl-' + n);
+  if (nl) nl.classList.add('act');
+  window.scrollTo(0, 0);
+}
+window.showPage = showPage;
+
+function gotoHome() { showPage('home'); renderHome(); }
+function gotoBrowse() { showPage('browse'); renderBrowse(db.anime, 'كل الأنمي'); }
+window.gotoHome = gotoHome;
+window.gotoBrowse = gotoBrowse;
+
+// ====== HERO ======
+function renderHome() {
+  renderGrid('home-grid', [...db.anime].reverse().slice(0, 12));
+  renderTop();
+  if (!db.anime.length) return;
+  const a = db.anime[db.anime.length - 1];
+  document.getElementById('htitle').textContent = a.nameAr || a.nameEn;
+  document.getElementById('hbadge').textContent = '🔥 ' + a.genre;
+  document.getElementById('hmeta').innerHTML = `<span>⭐ ${a.rating || '—'}</span><span class="dot"></span><span>${a.year || ''}</span><span class="dot"></span><span>${a.status || ''}</span>`;
+  document.getElementById('hdesc').textContent = a.desc || '';
+  const eps = db.episodes.filter(e => e.animeId === a.id).length;
+  document.getElementById('hbtns').innerHTML = `${eps ? `<button class="btn-p" onclick="showAnime('${a.id}')">▶ شاهد الآن</button>` : ''}<button class="btn-g" onclick="gotoBrowse()">تصفح الكل</button>`;
+  if (a.img) {
+    const bi = document.getElementById('hbg'); bi.src = a.img; bi.style.display = 'block';
+    const pi = document.getElementById('hpi'); pi.src = a.img; pi.style.display = 'block';
+    document.getElementById('hph').style.display = 'none';
+  } else {
+    document.getElementById('hbg').style.display = 'none';
+    document.getElementById('hpi').style.display = 'none';
+    const ph = document.getElementById('hph'); ph.style.display = 'flex'; ph.textContent = a.emoji || '🎌';
+  }
+}
+
+function renderTop() {
+  const el = document.getElementById('top-list');
+  const sorted = [...db.anime].sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0)).slice(0, 6);
+  if (!sorted.length) { el.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:6px 0">لا يوجد أنمي بعد</div>'; return; }
+  el.innerHTML = sorted.map(a => `<div class="top-item" onclick="showAnime('${a.id}')">
+    <div class="top-th">${a.img ? `<img src="${a.img}" alt="">` : `<div class="top-ph">${a.emoji || '🎌'}</div>`}</div>
+    <div><div class="top-name">${a.nameAr || a.nameEn}</div><div class="top-meta">⭐ ${a.rating || '—'} • ${a.genre || ''}</div></div>
   </div>`).join('');
 }
 
-// CARD
-function card(a){
-  const eps=db.episodes.filter(e=>e.animeId===a.id).length;
-  const th=a.img?`<img src="${a.img}" alt="">`:`<div class="acard-ph">${a.emoji||'🎌'}</div>`;
+// ====== CARDS ======
+function card(a) {
+  const eps = db.episodes.filter(e => e.animeId === a.id).length;
+  const th = a.img ? `<img src="${a.img}" alt="">` : `<div class="acard-ph">${a.emoji || '🎌'}</div>`;
   return `<div class="acard" onclick="showAnime('${a.id}')">
     <div class="acard-th">${th}
-      ${a.isNew?'<span class="acard-new">جديد</span>':''}
-      ${eps>0?`<span class="acard-ep">${eps} حلقة</span>`:''}
+      ${a.isNew ? '<span class="acard-new">جديد</span>' : ''}
+      ${eps > 0 ? `<span class="acard-ep">${eps} حلقة</span>` : ''}
       <div class="acard-ov"><div class="acard-play"><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div></div>
     </div>
     <div class="acard-info">
-      <div class="acard-title">${a.nameAr||a.nameEn}</div>
-      <div class="acard-meta"><span class="acard-rat">★ ${a.rating||'—'}</span><span>${a.genre||''}</span></div>
+      <div class="acard-title">${a.nameAr || a.nameEn}</div>
+      <div class="acard-meta"><span class="acard-rat">★ ${a.rating || '—'}</span><span>${a.genre || ''}</span></div>
     </div>
   </div>`;
 }
-function renderGrid(id,list){
-  const el=document.getElementById(id);
-  el.innerHTML=list.length?list.map(card).join(''):'<div class="empty"><div class="ei">🎌</div><p>لا يوجد أنمي بعد</p></div>';
-}
-function renderBrowse(list,title){document.getElementById('browse-title').textContent=title;renderGrid('browse-grid',list);}
-function filterG(g){showPage('browse');renderBrowse(db.anime.filter(a=>a.genre===g),'تصنيف: '+g);}
-function handleSearch(q){
-  if(!q.trim()){if(document.getElementById('page-browse').classList.contains('active'))renderBrowse(db.anime,'كل الأنمي');return;}
-  showPage('browse');
-  renderBrowse(db.anime.filter(a=>(a.nameAr+a.nameEn+a.genre).toLowerCase().includes(q.toLowerCase())),'نتائج: "'+q+'"');
-}
 
-// DETAIL
-function showAnime(id){
-  const a=db.anime.find(x=>x.id===id);if(!a)return;
-  const eps=db.episodes.filter(e=>e.animeId===id).sort((x,y)=>x.num-y.num);
-  const ph=a.img?`<img src="${a.img}" alt="">`:`<div class="det-poster-ph">${a.emoji||'🎌'}</div>`;
-  document.getElementById('det-hd').innerHTML=`
-    <div class="det-bg"><img src="${a.img||''}" alt="" style="${a.img?'':'display:none'}"><div class="det-ov"></div></div>
+function renderGrid(id, list) {
+  const el = document.getElementById(id);
+  el.innerHTML = list.length ? list.map(card).join('') : '<div class="empty"><div class="ei">🎌</div><p>لا يوجد أنمي بعد</p></div>';
+}
+function renderBrowse(list, title) { document.getElementById('browse-title').textContent = title; renderGrid('browse-grid', list); }
+function filterG(g) { showPage('browse'); renderBrowse(db.anime.filter(a => a.genre === g), 'تصنيف: ' + g); }
+function handleSearch(q) {
+  if (!q.trim()) { if (document.getElementById('page-browse').classList.contains('active')) renderBrowse(db.anime, 'كل الأنمي'); return; }
+  showPage('browse');
+  renderBrowse(db.anime.filter(a => (a.nameAr + a.nameEn + a.genre).toLowerCase().includes(q.toLowerCase())), 'نتائج: "' + q + '"');
+}
+window.filterG = filterG;
+window.handleSearch = handleSearch;
+
+// ====== DETAIL ======
+function showAnime(id) {
+  const a = db.anime.find(x => x.id === id); if (!a) return;
+  const eps = db.episodes.filter(e => e.animeId === id).sort((x, y) => x.num - y.num);
+  const ph = a.img ? `<img src="${a.img}" alt="">` : `<div class="det-poster-ph">${a.emoji || '🎌'}</div>`;
+  document.getElementById('det-hd').innerHTML = `
+    <div class="det-bg"><img src="${a.img || ''}" alt="" style="${a.img ? '' : 'display:none'}"><div class="det-ov"></div></div>
     <div class="det-body">
       <div class="det-poster">${ph}</div>
       <div class="det-info">
-        <h1>${a.nameAr||a.nameEn}</h1>
-        <div class="det-sub">${a.nameEn||''}</div>
-        <div class="dtags"><span class="dt dt-g">${a.genre||''}</span><span class="dt dt-y">${a.year||''}</span><span class="dt dt-s">${a.status||''}</span></div>
-        <div class="det-rat"><span class="star">★</span><span class="num">${a.rating||'—'}</span><span class="of">/ 10</span></div>
-        <div class="det-desc">${a.desc||''}</div>
+        <h1>${a.nameAr || a.nameEn}</h1>
+        <div class="det-sub">${a.nameEn || ''}</div>
+        <div class="dtags"><span class="dt dt-g">${a.genre || ''}</span><span class="dt dt-y">${a.year || ''}</span><span class="dt dt-s">${a.status || ''}</span></div>
+        <div class="det-rat"><span class="star">★</span><span class="num">${a.rating || '—'}</span><span class="of">/ 10</span></div>
+        <div class="det-desc">${a.desc || ''}</div>
         <div class="det-btns">
-          ${eps.length?`<button class="btn-p" onclick="playEp('${id}',0)">▶ شاهد الحلقة 1</button>`:''}
+          ${eps.length ? `<button class="btn-p" onclick="playEp('${id}',0)">▶ شاهد الحلقة 1</button>` : ''}
           <button class="btn-g" onclick="gotoHome()">← رجوع</button>
         </div>
       </div>
     </div>`;
-  document.getElementById('ep-count').textContent=eps.length+' حلقة';
-  document.getElementById('ep-grid').innerHTML=eps.length
-    ?eps.map((ep,i)=>`<div class="epcard" onclick="playEp('${id}',${i})">
-        <div class="epcard-num">${String(ep.num).padStart(2,'0')}</div>
-        <div class="epcard-info"><div class="epcard-title">${ep.title||'الحلقة '+ep.num}</div><div class="epcard-dur">${ep.dur||''}</div></div>
+  document.getElementById('ep-count').textContent = eps.length + ' حلقة';
+  document.getElementById('ep-grid').innerHTML = eps.length
+    ? eps.map((ep, i) => `<div class="epcard" onclick="playEp('${id}',${i})">
+        <div class="epcard-num">${String(ep.num).padStart(2, '0')}</div>
+        <div class="epcard-info"><div class="epcard-title">${ep.title || 'الحلقة ' + ep.num}</div><div class="epcard-dur">${ep.dur || ''}</div></div>
         <div class="epcard-play"><svg width="11" height="11" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div>
       </div>`).join('')
-    :'<div class="empty"><div class="ei">📺</div><p>لا توجد حلقات بعد</p></div>';
+    : '<div class="empty"><div class="ei">📺</div><p>لا توجد حلقات بعد</p></div>';
   showPage('anime');
 }
+window.showAnime = showAnime;
 
-// PLAYER
-function playEp(animeId,idx){
-  const a=db.anime.find(x=>x.id===animeId);
-  const eps=db.episodes.filter(e=>e.animeId===animeId).sort((x,y)=>x.num-y.num);
-  if(!eps[idx])return;
-  const ep=eps[idx];
-  document.getElementById('modal-title').textContent=`${a?a.nameAr||a.nameEn:''} — الحلقة ${ep.num}${ep.title?' — '+ep.title:''}`;
-  document.getElementById('modal-sub').textContent=ep.dur||'';
-  document.getElementById('modal-iframe').src=ep.url||'';
+// ====== PLAYER ======
+function playEp(animeId, idx) {
+  const a = db.anime.find(x => x.id === animeId);
+  const eps = db.episodes.filter(e => e.animeId === animeId).sort((x, y) => x.num - y.num);
+  if (!eps[idx]) return;
+  const ep = eps[idx];
+  document.getElementById('modal-title').textContent = `${a ? a.nameAr || a.nameEn : ''} — الحلقة ${ep.num}${ep.title ? ' — ' + ep.title : ''}`;
+  document.getElementById('modal-sub').textContent = ep.dur || '';
+  document.getElementById('modal-iframe').src = ep.url || '';
   document.getElementById('modal-ov').classList.add('open');
 }
-function closeModal(){document.getElementById('modal-ov').classList.remove('open');document.getElementById('modal-iframe').src='';}
-function closeModalOv(e){if(e.target===document.getElementById('modal-ov'))closeModal();}
+function closeModal() { document.getElementById('modal-ov').classList.remove('open'); document.getElementById('modal-iframe').src = ''; }
+function closeModalOv(e) { if (e.target === document.getElementById('modal-ov')) closeModal(); }
+window.playEp = playEp;
+window.closeModal = closeModal;
+window.closeModalOv = closeModalOv;
 
-// LOGIN
-function doLogin(){
-  if(document.getElementById('admin-pass').value===PASS){
-    document.getElementById('admin-pass').value='';
-    document.getElementById('lerr').style.display='none';
-    showPage('admin');renderAdmin();
-  }else{document.getElementById('lerr').style.display='block';}
+// ====== LOGIN ======
+function doLogin() {
+  if (document.getElementById('admin-pass').value === PASS) {
+    document.getElementById('admin-pass').value = '';
+    document.getElementById('lerr').style.display = 'none';
+    showPage('admin'); renderAdmin();
+  } else { document.getElementById('lerr').style.display = 'block'; }
 }
+window.doLogin = doLogin;
 
-// ADMIN
-function swTab(tab,btn){
-  document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.asec').forEach(s=>s.classList.remove('active'));
+// ====== ADMIN TABS ======
+function swTab(tab, btn) {
+  document.querySelectorAll('.atab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.asec').forEach(s => s.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('tab-'+tab).classList.add('active');
-  if(tab==='add-ep')refEpSel();
-  if(tab==='manage')renderManage();
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'add-ep') refEpSel();
+  if (tab === 'manage') renderManage();
 }
-
-// MANAGE SUB-TABS
-function swManage(tab,btn){
-  document.querySelectorAll('.mstab').forEach(t=>t.classList.remove('active'));
+function swManage(tab, btn) {
+  document.querySelectorAll('.mstab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('manage-anime').style.display=tab==='anime'?'block':'none';
-  document.getElementById('manage-eps').style.display=tab==='eps'?'block':'none';
-  if(tab==='eps')refEpFilterSel();
+  document.getElementById('manage-anime').style.display = tab === 'anime' ? 'block' : 'none';
+  document.getElementById('manage-eps').style.display = tab === 'eps' ? 'block' : 'none';
+  if (tab === 'eps') refEpFilterSel();
+}
+window.swTab = swTab;
+window.swManage = swManage;
+
+function refEpFilterSel() {
+  document.getElementById('ep-filter-sel').innerHTML = '<option value="">— اختر أنمي لعرض حلقاته —</option>' + db.anime.map(a => `<option value="${a.id}">${a.nameAr || a.nameEn}</option>`).join('');
+  document.getElementById('ep-mlist').innerHTML = '';
 }
 
-function refEpFilterSel(){
-  document.getElementById('ep-filter-sel').innerHTML='<option value="">— اختر أنمي لعرض حلقاته —</option>'+db.anime.map(a=>`<option value="${a.id}">${a.nameAr||a.nameEn}</option>`).join('');
-  document.getElementById('ep-mlist').innerHTML='';
-}
-
-function renderEpManage(){
-  const aid=document.getElementById('ep-filter-sel').value;
-  const el=document.getElementById('ep-mlist');
-  if(!aid){el.innerHTML='';return;}
-  const eps=db.episodes.filter(e=>e.animeId===aid).sort((a,b)=>a.num-b.num);
-  if(!eps.length){el.innerHTML='<div class="empty"><div class="ei">📺</div><p>لا توجد حلقات لهذا الأنمي</p></div>';return;}
-  el.innerHTML=eps.map(ep=>`<div class="mitem">
-    <div class="mth" style="display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:var(--primary2)">${String(ep.num).padStart(2,'0')}</div>
-    <div class="minfo">
-      <h4>${ep.title||'الحلقة '+ep.num}</h4>
-      <p>${ep.dur||''} ${ep.dur?'•':''} ${ep.url?'✅ رابط موجود':'❌ لا يوجد رابط'}</p>
-    </div>
+function renderEpManage() {
+  const aid = document.getElementById('ep-filter-sel').value;
+  const el = document.getElementById('ep-mlist');
+  if (!aid) { el.innerHTML = ''; return; }
+  const eps = db.episodes.filter(e => e.animeId === aid).sort((a, b) => a.num - b.num);
+  if (!eps.length) { el.innerHTML = '<div class="empty"><div class="ei">📺</div><p>لا توجد حلقات لهذا الأنمي</p></div>'; return; }
+  el.innerHTML = eps.map(ep => `<div class="mitem">
+    <div class="mth" style="display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:var(--primary2)">${String(ep.num).padStart(2, '0')}</div>
+    <div class="minfo"><h4>${ep.title || 'الحلقة ' + ep.num}</h4><p>${ep.dur || ''} ${ep.dur ? '•' : ''} ${ep.url ? '✅ رابط موجود' : '❌ لا يوجد رابط'}</p></div>
     <button class="btn-del" onclick="delEp('${ep.id}')">🗑 حذف</button>
   </div>`).join('');
 }
+window.renderEpManage = renderEpManage;
 
-function delEp(id){
-  if(!confirm('هل تريد حذف هذه الحلقة؟'))return;
-  db.episodes=db.episodes.filter(e=>e.id!==id);
-  save();renderEpManage();
-}
-
-function onImgSel(inp){
-  const f=inp.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=e=>{document.getElementById('a-imgd').value=e.target.result;const p=document.getElementById('up-prev');p.src=e.target.result;p.style.display='block';};
+// ====== ADD ANIME ======
+function onImgSel(inp) {
+  const f = inp.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = e => { document.getElementById('a-imgd').value = e.target.result; const p = document.getElementById('up-prev'); p.src = e.target.result; p.style.display = 'block'; };
   r.readAsDataURL(f);
 }
-function onDrop(e){
-  e.preventDefault();document.getElementById('upzone').style.borderColor='var(--border)';
-  const f=e.dataTransfer.files[0];if(!f||!f.type.startsWith('image/'))return;
-  const r=new FileReader();
-  r.onload=ev=>{document.getElementById('a-imgd').value=ev.target.result;const p=document.getElementById('up-prev');p.src=ev.target.result;p.style.display='block';};
+function onDrop(e) {
+  e.preventDefault(); document.getElementById('upzone').style.borderColor = 'var(--border)';
+  const f = e.dataTransfer.files[0]; if (!f || !f.type.startsWith('image/')) return;
+  const r = new FileReader();
+  r.onload = ev => { document.getElementById('a-imgd').value = ev.target.result; const p = document.getElementById('up-prev'); p.src = ev.target.result; p.style.display = 'block'; };
   r.readAsDataURL(f);
 }
-function addAnime(){
-  const ar=document.getElementById('a-ar').value.trim(),en=document.getElementById('a-en').value.trim();
-  if(!ar&&!en){alert('أدخل اسم الأنمي!');return;}
-  db.anime.push({id:'a'+Date.now(),nameAr:ar,nameEn:en,genre:document.getElementById('a-genre').value,rating:document.getElementById('a-rat').value,year:document.getElementById('a-yr').value,status:document.getElementById('a-st').value,desc:document.getElementById('a-desc').value,emoji:document.getElementById('a-emo').value||'🎌',img:document.getElementById('a-imgd').value||'',isNew:true,createdAt:Date.now()});
-  save();
-  ['a-ar','a-en','a-rat','a-yr','a-desc','a-emo','a-imgd'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('up-prev').style.display='none';document.getElementById('a-img').value='';
-  const m=document.getElementById('ok-a');m.style.display='block';setTimeout(()=>m.style.display='none',3000);
+window.onImgSel = onImgSel;
+window.onDrop = onDrop;
+
+async function addAnime() {
+  const ar = document.getElementById('a-ar').value.trim(), en = document.getElementById('a-en').value.trim();
+  if (!ar && !en) { alert('أدخل اسم الأنمي!'); return; }
+  // Use URL if provided, otherwise base64
+  const imgUrl = document.getElementById('a-imgurl').value.trim();
+  const imgBase64 = document.getElementById('a-imgd').value;
+  const img = imgUrl || imgBase64 || '';
+  const anime = {
+    id: 'a' + Date.now(),
+    nameAr: ar, nameEn: en,
+    genre: document.getElementById('a-genre').value,
+    rating: document.getElementById('a-rat').value,
+    year: document.getElementById('a-yr').value,
+    status: document.getElementById('a-st').value,
+    desc: document.getElementById('a-desc').value,
+    emoji: document.getElementById('a-emo').value || '🎌',
+    img: img,
+    isNew: true,
+    createdAt: Date.now()
+  };
+  db.anime.push(anime);
+  await saveAnime(anime);
+  ['a-ar','a-en','a-rat','a-yr','a-desc','a-emo','a-imgd','a-imgurl'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('up-prev').style.display = 'none';
+  document.getElementById('a-img').value = '';
+  const m = document.getElementById('ok-a'); m.style.display = 'block'; setTimeout(() => m.style.display = 'none', 3000);
 }
-function refEpSel(){document.getElementById('ep-sel').innerHTML='<option value="">— اختر أنمي —</option>'+db.anime.map(a=>`<option value="${a.id}">${a.nameAr||a.nameEn}</option>`).join('');}
-function addEp(){
-  const aid=document.getElementById('ep-sel').value;if(!aid){alert('اختر الأنمي!');return;}
-  const n=parseInt(document.getElementById('ep-n').value);if(!n){alert('أدخل رقم الحلقة!');return;}
-  db.episodes.push({id:'e'+Date.now(),animeId:aid,num:n,title:document.getElementById('ep-t').value.trim(),dur:document.getElementById('ep-d').value.trim(),url:document.getElementById('ep-u').value.trim(),createdAt:Date.now()});
-  save();['ep-n','ep-t','ep-d','ep-u'].forEach(id=>document.getElementById(id).value='');document.getElementById('ep-sel').value='';
-  const m=document.getElementById('ok-e');m.style.display='block';setTimeout(()=>m.style.display='none',3000);
+window.addAnime = addAnime;
+
+function refEpSel() {
+  document.getElementById('ep-sel').innerHTML = '<option value="">— اختر أنمي —</option>' + db.anime.map(a => `<option value="${a.id}">${a.nameAr || a.nameEn}</option>`).join('');
 }
-function renderAdmin(){refEpSel();renderManage();}
-function renderManage(){
-  const el=document.getElementById('mlist');
-  if(!db.anime.length){el.innerHTML='<div class="empty"><div class="ei">📋</div><p>لا يوجد أنمي بعد</p></div>';return;}
-  el.innerHTML=db.anime.map(a=>{
-    const eps=db.episodes.filter(e=>e.animeId===a.id).length;
+
+async function addEp() {
+  const aid = document.getElementById('ep-sel').value; if (!aid) { alert('اختر الأنمي!'); return; }
+  const n = parseInt(document.getElementById('ep-n').value); if (!n) { alert('أدخل رقم الحلقة!'); return; }
+  const ep = {
+    id: 'e' + Date.now(),
+    animeId: aid,
+    num: n,
+    title: document.getElementById('ep-t').value.trim(),
+    dur: document.getElementById('ep-d').value.trim(),
+    url: document.getElementById('ep-u').value.trim(),
+    createdAt: Date.now()
+  };
+  db.episodes.push(ep);
+  await saveEpisode(ep);
+  ['ep-n','ep-t','ep-d','ep-u'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('ep-sel').value = '';
+  const m = document.getElementById('ok-e'); m.style.display = 'block'; setTimeout(() => m.style.display = 'none', 3000);
+}
+window.addEp = addEp;
+
+function renderAdmin() { refEpSel(); renderManage(); }
+
+function renderManage() {
+  const el = document.getElementById('mlist');
+  if (!db.anime.length) { el.innerHTML = '<div class="empty"><div class="ei">📋</div><p>لا يوجد أنمي بعد</p></div>'; return; }
+  el.innerHTML = db.anime.map(a => {
+    const eps = db.episodes.filter(e => e.animeId === a.id).length;
     return `<div class="mitem">
-      <div class="mth">${a.img?`<img src="${a.img}" alt="">`:`<div class="mth-ph">${a.emoji||'🎌'}</div>`}</div>
-      <div class="minfo"><h4>${a.nameAr||a.nameEn}</h4><p>${a.genre||''} • ${eps} حلقة • ${a.status||''}</p></div>
+      <div class="mth">${a.img ? `<img src="${a.img}" alt="">` : `<div class="mth-ph">${a.emoji || '🎌'}</div>`}</div>
+      <div class="minfo"><h4>${a.nameAr || a.nameEn}</h4><p>${a.genre || ''} • ${eps} حلقة • ${a.status || ''}</p></div>
       <button class="btn-del" onclick="delA('${a.id}')">🗑 حذف</button>
     </div>`;
   }).join('');
 }
-function delA(id){
-  if(!confirm('هل تريد حذف هذا الأنمي وجميع حلقاته؟'))return;
-  db.anime=db.anime.filter(a=>a.id!==id);db.episodes=db.episodes.filter(e=>e.animeId!==id);
-  save();renderManage();
-}
-renderHome();
 
-// KEYBOARD SHORTCUT: Ctrl + Shift + A
-document.addEventListener('keydown', function(e) {
-  if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a' || e.code === 'KeyA')) {
-    e.preventDefault();
-    showPage('admin-login');
-  }
-});
+async function delEp(id) {
+  if (!confirm('هل تريد حذف هذه الحلقة؟')) return;
+  db.episodes = db.episodes.filter(e => e.id !== id);
+  await deleteEpisodeDoc(id);
+  renderEpManage();
+}
+
+async function delA(id) {
+  if (!confirm('هل تريد حذف هذا الأنمي وجميع حلقاته؟')) return;
+  db.anime = db.anime.filter(a => a.id !== id);
+  const toDelete = db.episodes.filter(e => e.animeId === id);
+  db.episodes = db.episodes.filter(e => e.animeId !== id);
+  await deleteAnimeDoc(id);
+  await Promise.all(toDelete.map(ep => deleteEpisodeDoc(ep.id)));
+  renderManage();
+}
+window.delEp = delEp;
+window.delA = delA;
+window.renderAdmin = renderAdmin;
+window.renderManage = renderManage;
+
+// ====== SECRET ADMIN ======
+let secretCount = 0, secretTimer;
+function secretClick() {
+  gotoHome();
+  secretCount++;
+  clearTimeout(secretTimer);
+  secretTimer = setTimeout(() => { secretCount = 0; }, 2000);
+  if (secretCount >= 5) { secretCount = 0; showPage('admin-login'); }
+}
+window.secretClick = secretClick;
+
+// ====== START ======
+loadFromFirebase();
 </script>
 </body>
 </html>
