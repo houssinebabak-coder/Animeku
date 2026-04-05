@@ -3,452 +3,271 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AnimeKu</title>
+<title>لوحة التحكم — AnimeKu</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 :root{
-  --bg:#0f0f13;
-  --bg2:#16161d;
-  --bg3:#1e1e28;
-  --surface:#23232f;
-  --surface2:#2a2a38;
-  --primary:#6c5ce7;
-  --primary2:#a29bfe;
-  --accent:#fd79a8;
-  --text:#e8e8f0;
-  --muted:#6b6b80;
-  --border:#2e2e3e;
-  --radius:10px;
-  --radius-lg:16px;
+  --bg:#0a0a0f;--bg2:#111118;--bg3:#16161f;--surface:#1c1c27;--surface2:#22222f;
+  --primary:#6c5ce7;--primary2:#a29bfe;--accent:#fd79a8;--green:#00d46a;
+  --text:#e8e8f0;--muted:#5a5a72;--border:#1e1e2e;--radius:10px;--radius-lg:14px;
 }
-body{background:var(--bg);color:var(--text);font-family:'Tajawal',sans-serif;min-height:100vh;overflow-x:hidden}
-a{text-decoration:none;color:inherit}
-img{display:block}
-.page{display:none}
-.page.active{display:block}
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:99px}
-
-/* LOADING SCREEN */
-#loading-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
-#loading-screen .llogo{font-size:36px;font-weight:800;color:#fff}
-#loading-screen .llogo span{color:var(--primary2)}
-.spinner{width:36px;height:36px;border:3px solid var(--surface2);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#loading-screen p{font-size:13px;color:var(--muted)}
-
-/* NAV */
-.nav{display:flex;align-items:center;gap:16px;padding:0 24px;height:64px;background:rgba(15,15,19,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:300}
-.logo{font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px;cursor:pointer;flex-shrink:0}
-.logo span{color:var(--primary2)}
-.nav-search{flex:1;max-width:400px;position:relative}
-.nav-search input{width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--text);border-radius:99px;padding:9px 18px 9px 40px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
-.nav-search input:focus{border-color:var(--primary)}
-.nav-search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none}
-.nav-links{display:flex;align-items:center;gap:4px;margin-right:auto}
-.nav-links a{padding:7px 14px;border-radius:99px;font-size:14px;font-weight:500;color:var(--muted);transition:all .2s;cursor:pointer;white-space:nowrap}
-.nav-links a:hover{color:var(--text);background:var(--surface)}
-.nav-links a.act{color:var(--primary2);background:rgba(108,92,231,.12)}
-.btn-admin{background:var(--primary);color:#fff;border:none;border-radius:99px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .2s;white-space:nowrap;flex-shrink:0}
-.btn-admin:hover{opacity:.85}
-
-/* HERO */
-.hero{position:relative;height:460px;overflow:hidden;display:flex;align-items:flex-end;padding:36px}
-.hero-bg{position:absolute;inset:0;background:#0a0a14}
-.hero-bg img{width:100%;height:100%;object-fit:cover;opacity:.22;position:absolute;inset:0}
-.hero-ov1{position:absolute;inset:0;background:linear-gradient(to top,var(--bg) 0%,rgba(15,15,19,.5) 55%,transparent 100%)}
-.hero-ov2{position:absolute;inset:0;background:linear-gradient(to left,transparent 35%,rgba(15,15,19,.92) 100%)}
-.hero-poster{position:absolute;left:52px;bottom:36px;z-index:2;width:155px;height:225px;border-radius:var(--radius-lg);overflow:hidden;border:2px solid rgba(255,255,255,.07);box-shadow:0 20px 60px rgba(0,0,0,.6)}
-.hero-poster-ph{width:100%;height:100%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:60px}
-.hero-content{position:relative;z-index:2;max-width:580px}
-.hero-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(108,92,231,.18);border:1px solid rgba(162,155,254,.28);color:var(--primary2);font-size:12px;font-weight:700;padding:4px 12px;border-radius:99px;margin-bottom:14px}
-.hero-title{font-size:38px;font-weight:800;line-height:1.15;margin-bottom:10px;color:#fff}
-.hero-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-.hero-meta span{font-size:13px;color:#999}
-.hero-meta .dot{width:3px;height:3px;border-radius:50%;background:#444;display:inline-block}
-.hero-desc{color:#888;font-size:14px;line-height:1.85;margin-bottom:22px;max-width:480px}
-.hero-btns{display:flex;gap:10px}
-.btn-p{background:var(--primary);color:#fff;border:none;border-radius:99px;padding:11px 26px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
-.btn-p:hover{background:#7d6ff0;transform:translateY(-1px)}
-.btn-g{background:rgba(255,255,255,.07);color:#ccc;border:1.5px solid rgba(255,255,255,.1);border-radius:99px;padding:11px 22px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s}
-.btn-g:hover{background:rgba(255,255,255,.13)}
-
-/* LAYOUT */
-.main-layout{display:grid;grid-template-columns:1fr 270px;gap:24px;padding:28px;align-items:start}
-
-/* SECTION */
-.sec{margin-bottom:8px}
-.sec-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-.sec-title{font-size:17px;font-weight:800;color:#fff;display:flex;align-items:center;gap:9px}
-.sec-title::before{content:'';width:3px;height:19px;background:var(--primary);border-radius:99px;display:block}
-.see-all{font-size:13px;color:var(--primary2);cursor:pointer;font-weight:500}
-.see-all:hover{text-decoration:underline}
-
-/* ANIME GRID */
-.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:14px}
-.acard{background:var(--bg2);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:transform .25s,box-shadow .25s,border-color .25s;border:1px solid var(--border)}
-.acard:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,.55);border-color:var(--primary)}
-.acard-th{height:206px;position:relative;overflow:hidden;background:var(--surface)}
-.acard-th img{width:100%;height:100%;object-fit:cover;transition:transform .35s}
-.acard:hover .acard-th img{transform:scale(1.07)}
-.acard-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:50px;background:linear-gradient(135deg,var(--surface),var(--surface2))}
-.acard-new{position:absolute;top:8px;right:8px;background:var(--primary);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;z-index:2}
-.acard-ep{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);color:#fff;font-size:10px;padding:3px 8px;border-radius:99px;z-index:2}
-.acard-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 50%);opacity:0;transition:opacity .25s;display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px}
-.acard:hover .acard-ov{opacity:1}
-.acard-play{width:40px;height:40px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center}
-.acard-info{padding:10px 12px 12px}
-.acard-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.acard-meta{font-size:11px;color:var(--muted);display:flex;justify-content:space-between}
-.acard-rat{color:#ffd32a;font-weight:700;font-size:12px}
-
-/* SIDEBAR */
-.sidebar-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:16px}
-.sb-title{font-size:13px;font-weight:800;color:#fff;margin-bottom:12px;display:flex;align-items:center;gap:7px}
-.sb-title::before{content:'';width:3px;height:15px;background:var(--accent);border-radius:99px;display:block}
-.top-item{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .2s}
-.top-item:last-child{border-bottom:none}
-.top-item:hover{opacity:.65}
-.top-th{width:42px;height:56px;border-radius:7px;overflow:hidden;background:var(--surface);flex-shrink:0}
-.top-th img{width:100%;height:100%;object-fit:cover}
-.top-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:18px}
-.top-name{font-size:12px;font-weight:700;color:#fff;margin-bottom:2px}
-.top-meta{font-size:11px;color:var(--muted)}
-.gtags{display:flex;flex-wrap:wrap;gap:7px}
-.gtag{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:99px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
-.gtag:hover{background:rgba(108,92,231,.14);border-color:var(--primary);color:var(--primary2)}
-
-/* DETAIL */
-.det-hd{position:relative;min-height:300px;overflow:hidden}
-.det-bg{position:absolute;inset:0;background:#0a0a14}
-.det-bg img{width:100%;height:100%;object-fit:cover;opacity:.18;position:absolute;inset:0}
-.det-ov{position:absolute;inset:0;background:linear-gradient(to top,var(--bg) 0%,rgba(15,15,19,.6) 60%,rgba(15,15,19,.4) 100%)}
-.det-body{position:relative;z-index:2;display:flex;gap:24px;padding:32px 24px;align-items:flex-end;width:100%}
-.det-poster{width:155px;height:220px;border-radius:var(--radius-lg);overflow:hidden;border:2px solid rgba(255,255,255,.08);flex-shrink:0;background:var(--surface);box-shadow:0 20px 50px rgba(0,0,0,.5)}
-.det-poster img{width:100%;height:100%;object-fit:cover}
-.det-poster-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:58px}
-.det-info h1{font-size:28px;font-weight:800;color:#fff;margin-bottom:5px;line-height:1.2}
-.det-sub{font-size:13px;color:var(--muted);margin-bottom:12px}
-.dtags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
-.dt{padding:4px 13px;border-radius:99px;font-size:12px;font-weight:600}
-.dt-g{background:rgba(108,92,231,.18);color:var(--primary2);border:1px solid rgba(108,92,231,.28)}
-.dt-y{background:var(--surface);color:var(--muted);border:1px solid var(--border)}
-.dt-s{background:rgba(0,200,100,.09);color:#00d46a;border:1px solid rgba(0,200,100,.18)}
-.det-rat{display:flex;align-items:center;gap:5px;margin-bottom:12px}
-.det-rat .star{color:#ffd32a;font-size:18px}
-.det-rat .num{font-size:26px;font-weight:800;color:#fff}
-.det-rat .of{font-size:12px;color:var(--muted)}
-.det-desc{font-size:14px;color:#888;line-height:1.85;margin-bottom:20px;max-width:580px}
-.det-btns{display:flex;gap:10px}
-
-/* EPISODES */
-.ep-sec{padding:22px 24px}
-.ep-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.ep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
-.epcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:all .2s}
-.epcard:hover{border-color:var(--primary);background:var(--bg3)}
-.epcard-num{font-size:24px;font-weight:800;color:var(--surface2);min-width:36px;direction:ltr;line-height:1}
-.epcard-info{flex:1;min-width:0}
-.epcard-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.epcard-dur{font-size:11px;color:var(--muted)}
-.epcard-play{width:33px;height:33px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
-.epcard:hover .epcard-play{background:#7d6ff0}
-
-/* MODAL */
-.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.87);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
-.modal-ov.open{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;width:93%;max-width:800px}
-.modal-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:13px}
-.modal-top h3{font-size:15px;font-weight:700;color:#fff;line-height:1.4;padding-left:10px}
-.modal-x{background:var(--surface);border:none;color:var(--muted);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.modal-x:hover{background:var(--surface2);color:#fff}
-.modal-player{width:100%;aspect-ratio:16/9;background:#000;border-radius:var(--radius);overflow:hidden}
-.modal-player iframe{width:100%;height:100%;border:none}
-.modal-sub{font-size:12px;color:var(--muted);margin-top:9px}
-
-/* ADMIN */
-.adm-wrap{max-width:800px;margin:0 auto;padding:28px 24px}
-.adm-wrap h2{font-size:21px;font-weight:800;color:#fff;margin-bottom:22px}
-.adm-tabs{display:flex;gap:3px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:24px}
-.atab{flex:1;padding:9px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .2s;border:none;background:none;font-family:inherit;text-align:center}
-.atab.active{background:var(--primary);color:#fff}
-.asec{display:none}
-.asec.active{display:block}
-.fg{margin-bottom:15px}
-.fg label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
-.fg input,.fg textarea,.fg select{width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--text);border-radius:var(--radius);padding:10px 14px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
-.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--primary)}
-.fg textarea{resize:vertical;min-height:88px}
-.fg select option{background:var(--surface)}
-.fgrow{display:grid;grid-template-columns:1fr 1fr;gap:13px}
-.upzone{border:2px dashed var(--border);border-radius:var(--radius);padding:26px;text-align:center;cursor:pointer;transition:border-color .2s;background:var(--surface)}
-.upzone:hover{border-color:var(--primary)}
-.upzone .uicon{font-size:30px;margin-bottom:7px}
-.upzone p{font-size:13px;color:var(--muted)}
-.upzone small{font-size:11px;color:var(--border)}
-.up-preview{max-height:190px;border-radius:var(--radius);margin:10px auto 0;display:none}
-.ok-msg{background:rgba(0,212,106,.09);border:1px solid rgba(0,212,106,.22);color:#00d46a;padding:10px 15px;border-radius:var(--radius);font-size:13px;font-weight:600;margin-bottom:13px;display:none}
-.mlist{display:flex;flex-direction:column;gap:9px}
-.mitem{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;display:flex;align-items:center;gap:13px}
-.mth{width:40px;height:54px;border-radius:7px;overflow:hidden;background:var(--surface);flex-shrink:0}
-.mth img{width:100%;height:100%;object-fit:cover}
-.mth-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:18px}
-.minfo h4{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px}
-.minfo p{font-size:12px;color:var(--muted)}
-.minfo{flex:1}
-.btn-del{background:rgba(255,70,70,.09);color:#ff7878;border:1px solid rgba(255,70,70,.18);border-radius:8px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
-.btn-del:hover{background:rgba(255,70,70,.18)}
-.manage-subtabs{display:flex;gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:3px;margin-bottom:16px}
-.mstab{flex:1;padding:7px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .2s;border:none;background:none;font-family:inherit;text-align:center}
-.mstab.active{background:var(--primary);color:#fff}
+body{background:var(--bg);color:var(--text);font-family:'Tajawal',sans-serif;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:99px}
 
 /* LOGIN */
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:38px 34px;width:100%;max-width:370px;text-align:center}
-.llogo{font-size:30px;font-weight:800;color:#fff;margin-bottom:5px}
-.llogo span{color:var(--primary2)}
-.lsub{font-size:13px;color:var(--muted);margin-bottom:26px}
-.lerr{background:rgba(255,70,70,.09);border:1px solid rgba(255,70,70,.18);color:#ff7878;padding:10px;border-radius:var(--radius);font-size:13px;margin-bottom:13px;display:none}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(108,92,231,.08) 0%,transparent 70%)}
+.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:44px 40px;width:100%;max-width:400px;text-align:center;box-shadow:0 40px 80px rgba(0,0,0,.5)}
+.login-logo{font-size:32px;font-weight:800;color:#fff;margin-bottom:4px}.login-logo span{color:var(--primary2)}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:30px}
+.login-field{text-align:right;margin-bottom:16px}
+.login-field label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:7px;letter-spacing:.5px;text-transform:uppercase}
+.login-field input{width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--text);border-radius:var(--radius);padding:12px 16px;font-size:15px;font-family:inherit;outline:none;transition:border-color .2s;text-align:right}
+.login-field input:focus{border-color:var(--primary)}
+.login-btn{width:100%;background:var(--primary);color:#fff;border:none;border-radius:var(--radius);padding:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:4px}
+.login-btn:hover{background:#7d6ff0;transform:translateY(-1px)}
+.login-err{background:rgba(255,70,70,.08);border:1px solid rgba(255,70,70,.2);color:#ff7878;padding:11px;border-radius:var(--radius);font-size:13px;margin-bottom:14px;display:none}
 
-/* FOOTER */
-.footer{background:var(--bg2);border-top:1px solid var(--border);padding:18px 24px;text-align:center;color:var(--muted);font-size:12px;margin-top:40px}
+/* LAYOUT */
+.app{display:none;min-height:100vh}
+.app.show{display:flex}
+.sidebar{width:240px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;right:0;bottom:0;z-index:100}
+.sidebar-logo{padding:24px 20px;border-bottom:1px solid var(--border)}
+.sidebar-logo h1{font-size:20px;font-weight:800;color:#fff}.sidebar-logo h1 span{color:var(--primary2)}
+.sidebar-logo p{font-size:11px;color:var(--muted);margin-top:2px}
+.sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);cursor:pointer;transition:all .2s;color:var(--muted);font-size:14px;font-weight:500;margin-bottom:2px}
+.nav-item:hover{background:var(--surface);color:var(--text)}
+.nav-item.active{background:rgba(108,92,231,.15);color:var(--primary2)}
+.nav-item .icon{font-size:18px;width:24px;text-align:center}
+.nav-sep{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.8px;padding:12px 12px 6px;text-transform:uppercase}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border)}
+.sidebar-footer a{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;text-decoration:none;transition:color .2s}
+.sidebar-footer a:hover{color:var(--text)}
 
-/* EMPTY */
-.empty{grid-column:1/-1;text-align:center;padding:52px 20px;color:var(--muted)}
-.empty .ei{font-size:44px;margin-bottom:10px}
-.empty p{font-size:14px}
+.main{margin-right:240px;flex:1;min-height:100vh}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:16px;font-weight:700;color:#fff}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.save-badge{background:rgba(0,212,106,.1);border:1px solid rgba(0,212,106,.2);color:var(--green);padding:5px 13px;border-radius:99px;font-size:12px;font-weight:600;display:none}
+.save-badge.show{display:inline-flex;align-items:center;gap:5px}
+.save-badge.err{background:rgba(255,70,70,.1);border-color:rgba(255,70,70,.2);color:#ff7878}
 
-/* SAVING INDICATOR */
-#save-indicator{position:fixed;bottom:20px;left:20px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:8px 16px;font-size:12px;color:var(--muted);display:none;align-items:center;gap:8px;z-index:999}
-#save-indicator.show{display:flex}
-#save-indicator.ok{color:#00d46a;border-color:rgba(0,212,106,.3)}
-#save-indicator.err{color:#ff7878;border-color:rgba(255,70,70,.3)}
+.content{padding:28px;display:none}
+.content.active{display:block}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 22px}
+.stat-card .label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px}
+.stat-card .val{font-size:30px;font-weight:800;color:#fff}
+.stat-card .sub{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* FORM */
+.form-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:20px}
+.form-card h3{font-size:15px;font-weight:700;color:#fff;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:7px;letter-spacing:.5px;text-transform:uppercase}
+.fg input,.fg textarea,.fg select{width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--text);border-radius:var(--radius);padding:11px 14px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--primary)}
+.fg textarea{resize:vertical;min-height:90px}
+.fg select option{background:var(--surface)}
+.fg .hint{font-size:11px;color:var(--muted);margin-top:5px}
+.fgrow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fgrow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.btn-submit{background:var(--primary);color:#fff;border:none;border-radius:var(--radius);padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-submit:hover{background:#7d6ff0;transform:translateY(-1px)}
+.ok-msg{background:rgba(0,212,106,.08);border:1px solid rgba(0,212,106,.2);color:var(--green);padding:11px 16px;border-radius:var(--radius);font-size:13px;font-weight:600;margin-bottom:16px;display:none;align-items:center;gap:7px}
+.ok-msg.show{display:flex}
+
+/* UPZONE */
+.upzone{border:2px dashed var(--border);border-radius:var(--radius);padding:22px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface)}
+.upzone:hover{border-color:var(--primary);background:rgba(108,92,231,.04)}
+.upzone .uicon{font-size:28px;margin-bottom:6px}
+.upzone p{font-size:13px;color:var(--muted)}
+.upzone small{font-size:11px;color:var(--border)}
+.up-prev{max-height:160px;border-radius:var(--radius);margin:10px auto 0;display:none}
+
+/* TABLE */
+.table-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:20px}
+.table-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border)}
+.table-head h3{font-size:14px;font-weight:700;color:#fff}
+.count-badge{background:var(--surface);color:var(--muted);font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px}
+.mitem{display:flex;align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid var(--border);transition:background .15s}
+.mitem:last-child{border-bottom:none}
+.mitem:hover{background:var(--bg3)}
+.mth{width:40px;height:54px;border-radius:8px;overflow:hidden;background:var(--surface);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px}
+.mth img{width:100%;height:100%;object-fit:cover}
+.minfo{flex:1}
+.minfo h4{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px}
+.minfo p{font-size:12px;color:var(--muted)}
+.mactions{display:flex;gap:8px}
+.btn-del{background:rgba(255,70,70,.08);color:#ff7878;border:1px solid rgba(255,70,70,.15);border-radius:8px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-del:hover{background:rgba(255,70,70,.18)}
+.empty-table{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty-table .ei{font-size:40px;margin-bottom:10px}
+.empty-table p{font-size:13px}
+
+/* EP FILTER */
+.ep-filter{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.ep-filter label{font-size:13px;color:var(--muted);font-weight:600;white-space:nowrap}
+.ep-filter select{flex:1;background:var(--surface);border:1.5px solid var(--border);color:var(--text);border-radius:var(--radius);padding:9px 14px;font-size:14px;font-family:inherit;outline:none}
+.ep-filter select:focus{border-color:var(--primary)}
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
-<div id="loading-screen">
-  <div class="llogo">Anime<span>Ku</span></div>
-  <div class="spinner"></div>
-  <p>جاري تحميل البيانات...</p>
-</div>
-
-<nav class="nav">
-  <div class="logo" onclick="gotoHome()">Anime<span>Ku</span></div>
-  <div class="nav-search">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input type="text" id="search-input" placeholder="ابحث عن أنمي..." oninput="handleSearch(this.value)">
-  </div>
-  <div class="nav-links">
-    <a onclick="gotoHome()" id="nl-home" class="act">الرئيسية</a>
-    <a onclick="gotoBrowse()" id="nl-browse">كل الأنمي</a>
-  </div>
-</nav>
-
-<!-- HOME -->
-<div class="page active" id="page-home">
-  <div class="hero">
-    <div class="hero-bg"><img id="hbg" src="" alt="" style="display:none"></div>
-    <div class="hero-ov1"></div><div class="hero-ov2"></div>
-    <div class="hero-poster" id="hero-poster">
-      <div class="hero-poster-ph" id="hph">🎌</div>
-      <img id="hpi" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover">
-    </div>
-    <div class="hero-content">
-      <div class="hero-badge" id="hbadge">🔥 أحدث إضافة</div>
-      <div class="hero-title" id="htitle">مرحباً في AnimeKu</div>
-      <div class="hero-meta" id="hmeta"><span>أضف أنمي من لوحة التحكم</span></div>
-      <div class="hero-desc" id="hdesc">موقعك الخاص لنشر ومشاهدة حلقات الأنمي المفضلة.</div>
-      <div class="hero-btns" id="hbtns"><button class="btn-g" onclick="gotoBrowse()">تصفح الكل</button></div>
-    </div>
-  </div>
-  <div class="main-layout">
-    <div>
-      <div class="sec">
-        <div class="sec-hd">
-          <div class="sec-title">أحدث الإضافات</div>
-          <span class="see-all" onclick="gotoBrowse()">عرض الكل ←</span>
-        </div>
-        <div class="agrid" id="home-grid">
-          <div class="empty"><div class="ei">🎌</div><p>لا يوجد أنمي — ابدأ من لوحة التحكم!</p></div>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="sidebar-box">
-        <div class="sb-title">الأعلى تقييماً</div>
-        <div id="top-list"><div style="color:var(--muted);font-size:13px;padding:6px 0">لا يوجد أنمي بعد</div></div>
-      </div>
-      <div class="sidebar-box">
-        <div class="sb-title">التصنيفات</div>
-        <div class="gtags">
-          <span class="gtag" onclick="filterG('أكشن')">أكشن</span>
-          <span class="gtag" onclick="filterG('خيال')">خيال</span>
-          <span class="gtag" onclick="filterG('رومانسي')">رومانسي</span>
-          <span class="gtag" onclick="filterG('كوميدي')">كوميدي</span>
-          <span class="gtag" onclick="filterG('رعب')">رعب</span>
-          <span class="gtag" onclick="filterG('مغامرة')">مغامرة</span>
-          <span class="gtag" onclick="filterG('خيال علمي')">خيال علمي</span>
-          <span class="gtag" onclick="filterG('دراما')">دراما</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- BROWSE -->
-<div class="page" id="page-browse">
-  <div style="padding:28px">
-    <div class="sec-hd" style="margin-bottom:18px">
-      <div class="sec-title" id="browse-title">كل الأنمي</div>
-    </div>
-    <div class="agrid" id="browse-grid"></div>
-  </div>
-</div>
-
-<!-- ANIME DETAIL -->
-<div class="page" id="page-anime">
-  <div class="det-hd" id="det-hd"></div>
-  <div class="ep-sec">
-    <div class="ep-hd">
-      <div class="sec-title">الحلقات</div>
-      <span id="ep-count" style="font-size:13px;color:var(--muted)"></span>
-    </div>
-    <div class="ep-grid" id="ep-grid"></div>
-  </div>
-</div>
-
 <!-- LOGIN -->
-<div class="page" id="page-admin-login">
-  <div class="login-wrap">
-    <div class="login-box">
-      <div class="llogo">Anime<span>Ku</span></div>
-      <div class="lsub">لوحة تحكم المشرف</div>
-      <div class="lerr" id="lerr">كلمة المرور خاطئة!</div>
-      <div class="fg" style="text-align:right">
-        <label>كلمة المرور</label>
-        <input type="password" id="admin-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-      </div>
-      <button class="btn-p" style="width:100%;justify-content:center;border-radius:10px" onclick="doLogin()">دخول</button>
-      <div style="margin-top:11px;font-size:11px;color:var(--muted)">كلمة المرور الافتراضية: admin123</div>
+<div id="login-wrap" class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">Anime<span>Ku</span></div>
+    <div class="login-sub">لوحة تحكم المشرف</div>
+    <div class="login-err" id="lerr">❌ كلمة المرور خاطئة</div>
+    <div class="login-field">
+      <label>كلمة المرور</label>
+      <input type="password" id="pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
+    <button class="login-btn" onclick="doLogin()">🔓 دخول</button>
   </div>
 </div>
 
-<!-- ADMIN -->
-<div class="page" id="page-admin">
-  <div class="adm-wrap">
-    <h2>⚙ لوحة التحكم</h2>
-    <div class="adm-tabs">
-      <button class="atab active" onclick="swTab('add-anime',this)">➕ إضافة أنمي</button>
-      <button class="atab" onclick="swTab('add-ep',this)">🎬 إضافة حلقة</button>
-      <button class="atab" onclick="swTab('manage',this)">📋 إدارة المحتوى</button>
+<!-- APP -->
+<div class="app" id="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <h1>Anime<span>Ku</span></h1>
+      <p>لوحة التحكم</p>
     </div>
+    <div class="sidebar-nav">
+      <div class="nav-sep">القائمة</div>
+      <div class="nav-item active" onclick="goTab('dashboard',this)"><span class="icon">📊</span> الإحصائيات</div>
+      <div class="nav-item" onclick="goTab('add-anime',this)"><span class="icon">➕</span> إضافة أنمي</div>
+      <div class="nav-item" onclick="goTab('add-ep',this)"><span class="icon">🎬</span> إضافة حلقة</div>
+      <div class="nav-sep">الإدارة</div>
+      <div class="nav-item" onclick="goTab('manage-anime',this)"><span class="icon">📋</span> إدارة الأنمي</div>
+      <div class="nav-item" onclick="goTab('manage-eps',this)"><span class="icon">📺</span> إدارة الحلقات</div>
+    </div>
+    <div class="sidebar-footer">
+      <a href="index.html" target="_blank">🌐 عرض الموقع</a>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">الإحصائيات</div>
+      <div class="topbar-right">
+        <span class="save-badge" id="save-badge">✅ تم الحفظ</span>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="content active" id="tab-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="label">🎌 إجمالي الأنمي</div><div class="val" id="stat-anime">0</div><div class="sub">أنمي مضاف</div></div>
+        <div class="stat-card"><div class="label">📺 إجمالي الحلقات</div><div class="val" id="stat-eps">0</div><div class="sub">حلقة مرفوعة</div></div>
+        <div class="stat-card"><div class="label">⭐ أعلى تقييم</div><div class="val" id="stat-top">—</div><div class="sub" id="stat-top-name">لا يوجد بعد</div></div>
+      </div>
+      <div class="table-card">
+        <div class="table-head"><h3>🆕 آخر الإضافات</h3></div>
+        <div id="recent-list"></div>
+      </div>
+    </div>
+
     <!-- ADD ANIME -->
-    <div class="asec active" id="tab-add-anime">
-      <div class="ok-msg" id="ok-a">✅ تمت إضافة الأنمي بنجاح!</div>
-      <div class="fgrow">
-        <div class="fg"><label>الاسم بالعربي</label><input type="text" id="a-ar" placeholder="هجوم العمالقة"></div>
-        <div class="fg"><label>الاسم بالإنجليزي</label><input type="text" id="a-en" placeholder="Attack on Titan"></div>
-      </div>
-      <div class="fgrow">
-        <div class="fg"><label>التصنيف</label>
-          <select id="a-genre"><option>أكشن</option><option>خيال</option><option>رومانسي</option><option>كوميدي</option><option>رعب</option><option>مغامرة</option><option>خيال علمي</option><option>رياضة</option><option>دراما</option></select>
+    <div class="content" id="tab-add-anime">
+      <div class="form-card">
+        <h3>➕ إضافة أنمي جديد</h3>
+        <div class="ok-msg" id="ok-a">✅ تمت إضافة الأنمي بنجاح!</div>
+        <div class="fgrow">
+          <div class="fg"><label>الاسم بالعربي</label><input type="text" id="a-ar" placeholder="هجوم العمالقة"></div>
+          <div class="fg"><label>الاسم بالإنجليزي</label><input type="text" id="a-en" placeholder="Attack on Titan"></div>
         </div>
-        <div class="fg"><label>التقييم (1-10)</label><input type="number" id="a-rat" placeholder="9.5" min="1" max="10" step="0.1"></div>
-      </div>
-      <div class="fgrow">
-        <div class="fg"><label>سنة الإصدار</label><input type="text" id="a-yr" placeholder="2024"></div>
-        <div class="fg"><label>الحالة</label><select id="a-st"><option>مستمر</option><option>مكتمل</option><option>قادم</option></select></div>
-      </div>
-      <div class="fg"><label>الوصف</label><textarea id="a-desc" placeholder="اكتب وصف الأنمي..."></textarea></div>
-      <div class="fg">
-        <label>رابط صورة الغلاف (URL)</label>
-        <input type="text" id="a-imgurl" placeholder="https://example.com/image.jpg">
-        <div style="font-size:11px;color:var(--muted);margin-top:5px">ضع رابط صورة من الإنترنت مباشرة</div>
-      </div>
-      <div class="fg"><label>أو أدخل رابط صورة مباشر</label>
-        <div class="upzone" id="upzone" onclick="document.getElementById('a-img').click()" ondragover="event.preventDefault();this.style.borderColor='var(--primary)'" ondragleave="this.style.borderColor='var(--border)'" ondrop="onDrop(event)">
-          <div class="uicon">🖼️</div>
-          <p>اضغط لاختيار صورة أو اسحبها هنا</p>
-          <small>JPG • PNG • WEBP</small>
-          <img id="up-prev" class="up-preview">
+        <div class="fgrow3">
+          <div class="fg"><label>التصنيف</label>
+            <select id="a-genre"><option>أكشن</option><option>خيال</option><option>رومانسي</option><option>كوميدي</option><option>رعب</option><option>مغامرة</option><option>خيال علمي</option><option>رياضة</option><option>دراما</option></select>
+          </div>
+          <div class="fg"><label>التقييم (1-10)</label><input type="number" id="a-rat" placeholder="9.5" min="1" max="10" step="0.1"></div>
+          <div class="fg"><label>سنة الإصدار</label><input type="text" id="a-yr" placeholder="2024"></div>
         </div>
-        <input type="file" id="a-img" accept="image/*" style="display:none" onchange="onImgSel(this)">
-        <input type="hidden" id="a-imgd">
-      </div>
-      <div class="fg"><label>إيموجي بديل (إذا لم تضف صورة)</label><input type="text" id="a-emo" placeholder="⚔️" maxlength="4"></div>
-      <button class="btn-p" style="border-radius:10px" onclick="addAnime()">➕ إضافة الأنمي</button>
-    </div>
-    <!-- ADD EP -->
-    <div class="asec" id="tab-add-ep">
-      <div class="ok-msg" id="ok-e">✅ تمت إضافة الحلقة بنجاح!</div>
-      <div class="fg"><label>اختر الأنمي</label><select id="ep-sel"><option value="">— اختر أنمي —</option></select></div>
-      <div class="fgrow">
-        <div class="fg"><label>رقم الحلقة</label><input type="number" id="ep-n" placeholder="1" min="1"></div>
-        <div class="fg"><label>المدة</label><input type="text" id="ep-d" placeholder="24 دقيقة"></div>
-      </div>
-      <div class="fg"><label>عنوان الحلقة</label><input type="text" id="ep-t" placeholder="البداية"></div>
-      <div class="fg">
-        <label>رابط الفيديو</label>
-        <input type="text" id="ep-u" placeholder="https://www.youtube.com/embed/XXX">
-        <div style="font-size:11px;color:var(--muted);margin-top:5px">يوتيوب: افتح الفيديو ← مشاركة ← تضمين ← انسخ رابط src</div>
-      </div>
-      <button class="btn-p" style="border-radius:10px" onclick="addEp()">🎬 إضافة الحلقة</button>
-    </div>
-    <!-- MANAGE -->
-    <div class="asec" id="tab-manage">
-      <div class="manage-subtabs">
-        <button class="mstab active" onclick="swManage('anime',this)">🎬 إدارة الأنمي</button>
-        <button class="mstab" onclick="swManage('eps',this)">📺 إدارة الحلقات</button>
-      </div>
-      <div id="manage-anime">
-        <div class="mlist" id="mlist"></div>
-      </div>
-      <div id="manage-eps" style="display:none">
+        <div class="fgrow">
+          <div class="fg"><label>الحالة</label><select id="a-st"><option>مستمر</option><option>مكتمل</option><option>قادم</option></select></div>
+          <div class="fg"><label>إيموجي بديل</label><input type="text" id="a-emo" placeholder="⚔️" maxlength="4"></div>
+        </div>
+        <div class="fg"><label>الوصف</label><textarea id="a-desc" placeholder="اكتب وصف الأنمي..."></textarea></div>
         <div class="fg">
-          <label>اختر الأنمي</label>
-          <select id="ep-filter-sel" onchange="renderEpManage()">
-            <option value="">— اختر أنمي لعرض حلقاته —</option>
-          </select>
+          <label>رابط صورة الغلاف (URL مباشر)</label>
+          <input type="text" id="a-imgurl" placeholder="https://example.com/poster.jpg">
+          <div class="hint">الصق رابط صورة مباشر من الإنترنت — أو ارفع صورة من جهازك أدناه</div>
         </div>
-        <div class="mlist" id="ep-mlist"></div>
+        <div class="fg">
+          <label>رفع صورة من الجهاز</label>
+          <div class="upzone" onclick="document.getElementById('a-img').click()" ondragover="event.preventDefault();this.style.borderColor='var(--primary)'" ondragleave="this.style.borderColor='var(--border)'" ondrop="onDrop(event)">
+            <div class="uicon">🖼️</div>
+            <p>اضغط أو اسحب صورة هنا</p>
+            <small>JPG • PNG • WEBP</small>
+            <img id="up-prev" class="up-prev">
+          </div>
+          <input type="file" id="a-img" accept="image/*" style="display:none" onchange="onImgSel(this)">
+          <input type="hidden" id="a-imgd">
+        </div>
+        <button class="btn-submit" onclick="addAnime()">➕ إضافة الأنمي</button>
+      </div>
+    </div>
+
+    <!-- ADD EP -->
+    <div class="content" id="tab-add-ep">
+      <div class="form-card">
+        <h3>🎬 إضافة حلقة</h3>
+        <div class="ok-msg" id="ok-e">✅ تمت إضافة الحلقة بنجاح!</div>
+        <div class="fg"><label>اختر الأنمي</label><select id="ep-sel"><option value="">— اختر أنمي —</option></select></div>
+        <div class="fgrow">
+          <div class="fg"><label>رقم الحلقة</label><input type="number" id="ep-n" placeholder="1" min="1"></div>
+          <div class="fg"><label>المدة</label><input type="text" id="ep-d" placeholder="24 دقيقة"></div>
+        </div>
+        <div class="fg"><label>عنوان الحلقة</label><input type="text" id="ep-t" placeholder="البداية"></div>
+        <div class="fg">
+          <label>رابط الفيديو (embed)</label>
+          <input type="text" id="ep-u" placeholder="https://www.youtube.com/embed/XXXX">
+          <div class="hint">يوتيوب: افتح الفيديو ← مشاركة ← تضمين ← انسخ رابط src فقط</div>
+        </div>
+        <button class="btn-submit" onclick="addEp()">🎬 إضافة الحلقة</button>
+      </div>
+    </div>
+
+    <!-- MANAGE ANIME -->
+    <div class="content" id="tab-manage-anime">
+      <div class="table-card">
+        <div class="table-head">
+          <h3>🎌 قائمة الأنمي</h3>
+          <span class="count-badge" id="anime-count">0 أنمي</span>
+        </div>
+        <div id="anime-list"></div>
+      </div>
+    </div>
+
+    <!-- MANAGE EPS -->
+    <div class="content" id="tab-manage-eps">
+      <div class="ep-filter">
+        <label>اختر الأنمي:</label>
+        <select id="ep-filter-sel" onchange="renderEpList()"><option value="">— اختر أنمي —</option></select>
+      </div>
+      <div class="table-card">
+        <div class="table-head">
+          <h3>📺 الحلقات</h3>
+          <span class="count-badge" id="ep-count-badge">0 حلقة</span>
+        </div>
+        <div id="ep-list"></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MODAL -->
-<div class="modal-ov" id="modal-ov" onclick="closeModalOv(event)">
-  <div class="modal">
-    <div class="modal-top">
-      <h3 id="modal-title">—</h3>
-      <button class="modal-x" onclick="closeModal()">✕</button>
-    </div>
-    <div class="modal-player"><iframe id="modal-iframe" allowfullscreen allow="autoplay; fullscreen"></iframe></div>
-    <div class="modal-sub" id="modal-sub"></div>
-  </div>
-</div>
-
-<div id="save-indicator">⏳ جاري الحفظ...</div>
-<div class="footer">© 2025 AnimeKu — جميع الحقوق محفوظة</div>
-
-<!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  doc,
-  setDoc,
-  deleteDoc
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-// ====== CONFIG ======
 const firebaseConfig = {
   apiKey: "AIzaSyBF8vTJtFXq_sfYVmg8-fwj4dReRTe8iwM",
   authDomain: "animeku-96667.firebaseapp.com",
@@ -458,371 +277,195 @@ const firebaseConfig = {
   appId: "1:61899898827:web:214ce9ca7f18e85df9f48e"
 };
 
-const app = initializeApp(firebaseConfig);
-const db_fire = getFirestore(app);
-
-// ====== LOCAL STATE ======
 const PASS = 'admin123';
+const fapp = initializeApp(firebaseConfig);
+const fdb = getFirestore(fapp);
 let db = { anime: [], episodes: [] };
 
-// ====== SAVE INDICATOR ======
-function showSave(state, msg) {
-  const el = document.getElementById('save-indicator');
-  el.className = 'show ' + (state || '');
-  el.textContent = msg || '⏳ جاري الحفظ...';
-  if (state === 'ok') setTimeout(() => el.className = '', 2000);
-}
-
-// ====== FIREBASE SAVE ======
-async function saveAnime(anime) {
-  showSave('', '⏳ جاري الحفظ...');
-  try {
-    await setDoc(doc(db_fire, 'anime', anime.id), anime);
-    showSave('ok', '✅ تم الحفظ');
-  } catch (e) {
-    showSave('err', '❌ خطأ في الحفظ');
-    console.error(e);
-  }
-}
-
-async function saveEpisode(ep) {
-  showSave('', '⏳ جاري الحفظ...');
-  try {
-    await setDoc(doc(db_fire, 'episodes', ep.id), ep);
-    showSave('ok', '✅ تم الحفظ');
-  } catch (e) {
-    showSave('err', '❌ خطأ في الحفظ');
-    console.error(e);
-  }
-}
-
-async function deleteAnimeDoc(id) {
-  try { await deleteDoc(doc(db_fire, 'anime', id)); } catch(e){ console.error(e); }
-}
-
-async function deleteEpisodeDoc(id) {
-  try { await deleteDoc(doc(db_fire, 'episodes', id)); } catch(e){ console.error(e); }
-}
-
-// ====== LOAD FROM FIREBASE ======
-async function loadFromFirebase() {
-  try {
-    const [animeSnap, epsSnap] = await Promise.all([
-      getDocs(collection(db_fire, 'anime')),
-      getDocs(collection(db_fire, 'episodes'))
-    ]);
-    db.anime = animeSnap.docs.map(d => d.data());
-    db.episodes = epsSnap.docs.map(d => d.data());
-    db.anime.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-  } catch (e) {
-    console.error('Firebase load error:', e);
-  }
-  document.getElementById('loading-screen').style.display = 'none';
-  renderHome();
-}
-
-// ====== PAGES ======
-function showPage(n) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + n).classList.add('active');
-  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('act'));
-  const nl = document.getElementById('nl-' + n);
-  if (nl) nl.classList.add('act');
-  window.scrollTo(0, 0);
-}
-window.showPage = showPage;
-
-function gotoHome() { showPage('home'); renderHome(); }
-function gotoBrowse() { showPage('browse'); renderBrowse(db.anime, 'كل الأنمي'); }
-window.gotoHome = gotoHome;
-window.gotoBrowse = gotoBrowse;
-
-// ====== HERO ======
-function renderHome() {
-  renderGrid('home-grid', [...db.anime].reverse().slice(0, 12));
-  renderTop();
-  if (!db.anime.length) return;
-  const a = db.anime[db.anime.length - 1];
-  document.getElementById('htitle').textContent = a.nameAr || a.nameEn;
-  document.getElementById('hbadge').textContent = '🔥 ' + a.genre;
-  document.getElementById('hmeta').innerHTML = `<span>⭐ ${a.rating || '—'}</span><span class="dot"></span><span>${a.year || ''}</span><span class="dot"></span><span>${a.status || ''}</span>`;
-  document.getElementById('hdesc').textContent = a.desc || '';
-  const eps = db.episodes.filter(e => e.animeId === a.id).length;
-  document.getElementById('hbtns').innerHTML = `${eps ? `<button class="btn-p" onclick="showAnime('${a.id}')">▶ شاهد الآن</button>` : ''}<button class="btn-g" onclick="gotoBrowse()">تصفح الكل</button>`;
-  if (a.img) {
-    const bi = document.getElementById('hbg'); bi.src = a.img; bi.style.display = 'block';
-    const pi = document.getElementById('hpi'); pi.src = a.img; pi.style.display = 'block';
-    document.getElementById('hph').style.display = 'none';
-  } else {
-    document.getElementById('hbg').style.display = 'none';
-    document.getElementById('hpi').style.display = 'none';
-    const ph = document.getElementById('hph'); ph.style.display = 'flex'; ph.textContent = a.emoji || '🎌';
-  }
-}
-
-function renderTop() {
-  const el = document.getElementById('top-list');
-  const sorted = [...db.anime].sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0)).slice(0, 6);
-  if (!sorted.length) { el.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:6px 0">لا يوجد أنمي بعد</div>'; return; }
-  el.innerHTML = sorted.map(a => `<div class="top-item" onclick="showAnime('${a.id}')">
-    <div class="top-th">${a.img ? `<img src="${a.img}" alt="">` : `<div class="top-ph">${a.emoji || '🎌'}</div>`}</div>
-    <div><div class="top-name">${a.nameAr || a.nameEn}</div><div class="top-meta">⭐ ${a.rating || '—'} • ${a.genre || ''}</div></div>
-  </div>`).join('');
-}
-
-// ====== CARDS ======
-function card(a) {
-  const eps = db.episodes.filter(e => e.animeId === a.id).length;
-  const th = a.img ? `<img src="${a.img}" alt="">` : `<div class="acard-ph">${a.emoji || '🎌'}</div>`;
-  return `<div class="acard" onclick="showAnime('${a.id}')">
-    <div class="acard-th">${th}
-      ${a.isNew ? '<span class="acard-new">جديد</span>' : ''}
-      ${eps > 0 ? `<span class="acard-ep">${eps} حلقة</span>` : ''}
-      <div class="acard-ov"><div class="acard-play"><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div></div>
-    </div>
-    <div class="acard-info">
-      <div class="acard-title">${a.nameAr || a.nameEn}</div>
-      <div class="acard-meta"><span class="acard-rat">★ ${a.rating || '—'}</span><span>${a.genre || ''}</span></div>
-    </div>
-  </div>`;
-}
-
-function renderGrid(id, list) {
-  const el = document.getElementById(id);
-  el.innerHTML = list.length ? list.map(card).join('') : '<div class="empty"><div class="ei">🎌</div><p>لا يوجد أنمي بعد</p></div>';
-}
-function renderBrowse(list, title) { document.getElementById('browse-title').textContent = title; renderGrid('browse-grid', list); }
-function filterG(g) { showPage('browse'); renderBrowse(db.anime.filter(a => a.genre === g), 'تصنيف: ' + g); }
-function handleSearch(q) {
-  if (!q.trim()) { if (document.getElementById('page-browse').classList.contains('active')) renderBrowse(db.anime, 'كل الأنمي'); return; }
-  showPage('browse');
-  renderBrowse(db.anime.filter(a => (a.nameAr + a.nameEn + a.genre).toLowerCase().includes(q.toLowerCase())), 'نتائج: "' + q + '"');
-}
-window.filterG = filterG;
-window.handleSearch = handleSearch;
-
-// ====== DETAIL ======
-function showAnime(id) {
-  const a = db.anime.find(x => x.id === id); if (!a) return;
-  const eps = db.episodes.filter(e => e.animeId === id).sort((x, y) => x.num - y.num);
-  const ph = a.img ? `<img src="${a.img}" alt="">` : `<div class="det-poster-ph">${a.emoji || '🎌'}</div>`;
-  document.getElementById('det-hd').innerHTML = `
-    <div class="det-bg"><img src="${a.img || ''}" alt="" style="${a.img ? '' : 'display:none'}"><div class="det-ov"></div></div>
-    <div class="det-body">
-      <div class="det-poster">${ph}</div>
-      <div class="det-info">
-        <h1>${a.nameAr || a.nameEn}</h1>
-        <div class="det-sub">${a.nameEn || ''}</div>
-        <div class="dtags"><span class="dt dt-g">${a.genre || ''}</span><span class="dt dt-y">${a.year || ''}</span><span class="dt dt-s">${a.status || ''}</span></div>
-        <div class="det-rat"><span class="star">★</span><span class="num">${a.rating || '—'}</span><span class="of">/ 10</span></div>
-        <div class="det-desc">${a.desc || ''}</div>
-        <div class="det-btns">
-          ${eps.length ? `<button class="btn-p" onclick="playEp('${id}',0)">▶ شاهد الحلقة 1</button>` : ''}
-          <button class="btn-g" onclick="gotoHome()">← رجوع</button>
-        </div>
-      </div>
-    </div>`;
-  document.getElementById('ep-count').textContent = eps.length + ' حلقة';
-  document.getElementById('ep-grid').innerHTML = eps.length
-    ? eps.map((ep, i) => `<div class="epcard" onclick="playEp('${id}',${i})">
-        <div class="epcard-num">${String(ep.num).padStart(2, '0')}</div>
-        <div class="epcard-info"><div class="epcard-title">${ep.title || 'الحلقة ' + ep.num}</div><div class="epcard-dur">${ep.dur || ''}</div></div>
-        <div class="epcard-play"><svg width="11" height="11" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div>
-      </div>`).join('')
-    : '<div class="empty"><div class="ei">📺</div><p>لا توجد حلقات بعد</p></div>';
-  showPage('anime');
-}
-window.showAnime = showAnime;
-
-// ====== PLAYER ======
-function playEp(animeId, idx) {
-  const a = db.anime.find(x => x.id === animeId);
-  const eps = db.episodes.filter(e => e.animeId === animeId).sort((x, y) => x.num - y.num);
-  if (!eps[idx]) return;
-  const ep = eps[idx];
-  document.getElementById('modal-title').textContent = `${a ? a.nameAr || a.nameEn : ''} — الحلقة ${ep.num}${ep.title ? ' — ' + ep.title : ''}`;
-  document.getElementById('modal-sub').textContent = ep.dur || '';
-  document.getElementById('modal-iframe').src = ep.url || '';
-  document.getElementById('modal-ov').classList.add('open');
-}
-function closeModal() { document.getElementById('modal-ov').classList.remove('open'); document.getElementById('modal-iframe').src = ''; }
-function closeModalOv(e) { if (e.target === document.getElementById('modal-ov')) closeModal(); }
-window.playEp = playEp;
-window.closeModal = closeModal;
-window.closeModalOv = closeModalOv;
-
-// ====== LOGIN ======
+// ---- LOGIN ----
 function doLogin() {
-  if (document.getElementById('admin-pass').value === PASS) {
-    document.getElementById('admin-pass').value = '';
+  if (document.getElementById('pass').value === PASS) {
     document.getElementById('lerr').style.display = 'none';
-    showPage('admin'); renderAdmin();
-  } else { document.getElementById('lerr').style.display = 'block'; }
+    document.getElementById('login-wrap').style.display = 'none';
+    document.getElementById('app').classList.add('show');
+    loadData();
+  } else {
+    document.getElementById('lerr').style.display = 'block';
+    document.getElementById('pass').value = '';
+  }
 }
 window.doLogin = doLogin;
 
-// ====== ADMIN TABS ======
-function swTab(tab, btn) {
-  document.querySelectorAll('.atab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.asec').forEach(s => s.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('tab-' + tab).classList.add('active');
-  if (tab === 'add-ep') refEpSel();
-  if (tab === 'manage') renderManage();
-}
-function swManage(tab, btn) {
-  document.querySelectorAll('.mstab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('manage-anime').style.display = tab === 'anime' ? 'block' : 'none';
-  document.getElementById('manage-eps').style.display = tab === 'eps' ? 'block' : 'none';
-  if (tab === 'eps') refEpFilterSel();
-}
-window.swTab = swTab;
-window.swManage = swManage;
-
-function refEpFilterSel() {
-  document.getElementById('ep-filter-sel').innerHTML = '<option value="">— اختر أنمي لعرض حلقاته —</option>' + db.anime.map(a => `<option value="${a.id}">${a.nameAr || a.nameEn}</option>`).join('');
-  document.getElementById('ep-mlist').innerHTML = '';
+// ---- FIREBASE ----
+async function loadData() {
+  const [as, es] = await Promise.all([getDocs(collection(fdb,'anime')), getDocs(collection(fdb,'episodes'))]);
+  db.anime = as.docs.map(d=>d.data()).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  db.episodes = es.docs.map(d=>d.data());
+  renderDashboard();
 }
 
-function renderEpManage() {
-  const aid = document.getElementById('ep-filter-sel').value;
-  const el = document.getElementById('ep-mlist');
-  if (!aid) { el.innerHTML = ''; return; }
-  const eps = db.episodes.filter(e => e.animeId === aid).sort((a, b) => a.num - b.num);
-  if (!eps.length) { el.innerHTML = '<div class="empty"><div class="ei">📺</div><p>لا توجد حلقات لهذا الأنمي</p></div>'; return; }
-  el.innerHTML = eps.map(ep => `<div class="mitem">
-    <div class="mth" style="display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:var(--primary2)">${String(ep.num).padStart(2, '0')}</div>
-    <div class="minfo"><h4>${ep.title || 'الحلقة ' + ep.num}</h4><p>${ep.dur || ''} ${ep.dur ? '•' : ''} ${ep.url ? '✅ رابط موجود' : '❌ لا يوجد رابط'}</p></div>
-    <button class="btn-del" onclick="delEp('${ep.id}')">🗑 حذف</button>
-  </div>`).join('');
-}
-window.renderEpManage = renderEpManage;
-
-// ====== ADD ANIME ======
-function onImgSel(inp) {
-  const f = inp.files[0]; if (!f) return;
-  const r = new FileReader();
-  r.onload = e => { document.getElementById('a-imgd').value = e.target.result; const p = document.getElementById('up-prev'); p.src = e.target.result; p.style.display = 'block'; };
-  r.readAsDataURL(f);
-}
-function onDrop(e) {
-  e.preventDefault(); document.getElementById('upzone').style.borderColor = 'var(--border)';
-  const f = e.dataTransfer.files[0]; if (!f || !f.type.startsWith('image/')) return;
-  const r = new FileReader();
-  r.onload = ev => { document.getElementById('a-imgd').value = ev.target.result; const p = document.getElementById('up-prev'); p.src = ev.target.result; p.style.display = 'block'; };
-  r.readAsDataURL(f);
-}
-window.onImgSel = onImgSel;
-window.onDrop = onDrop;
-
-async function addAnime() {
-  const ar = document.getElementById('a-ar').value.trim(), en = document.getElementById('a-en').value.trim();
-  if (!ar && !en) { alert('أدخل اسم الأنمي!'); return; }
-  // Use URL if provided, otherwise base64
-  const imgUrl = document.getElementById('a-imgurl').value.trim();
-  const imgBase64 = document.getElementById('a-imgd').value;
-  const img = imgUrl || imgBase64 || '';
-  const anime = {
-    id: 'a' + Date.now(),
-    nameAr: ar, nameEn: en,
-    genre: document.getElementById('a-genre').value,
-    rating: document.getElementById('a-rat').value,
-    year: document.getElementById('a-yr').value,
-    status: document.getElementById('a-st').value,
-    desc: document.getElementById('a-desc').value,
-    emoji: document.getElementById('a-emo').value || '🎌',
-    img: img,
-    isNew: true,
-    createdAt: Date.now()
-  };
-  db.anime.push(anime);
-  await saveAnime(anime);
-  ['a-ar','a-en','a-rat','a-yr','a-desc','a-emo','a-imgd','a-imgurl'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('up-prev').style.display = 'none';
-  document.getElementById('a-img').value = '';
-  const m = document.getElementById('ok-a'); m.style.display = 'block'; setTimeout(() => m.style.display = 'none', 3000);
-}
-window.addAnime = addAnime;
-
-function refEpSel() {
-  document.getElementById('ep-sel').innerHTML = '<option value="">— اختر أنمي —</option>' + db.anime.map(a => `<option value="${a.id}">${a.nameAr || a.nameEn}</option>`).join('');
+function showBadge(ok, msg) {
+  const b = document.getElementById('save-badge');
+  b.textContent = msg; b.className = 'save-badge show' + (ok ? '' : ' err');
+  setTimeout(() => b.className = 'save-badge', 2500);
 }
 
-async function addEp() {
-  const aid = document.getElementById('ep-sel').value; if (!aid) { alert('اختر الأنمي!'); return; }
-  const n = parseInt(document.getElementById('ep-n').value); if (!n) { alert('أدخل رقم الحلقة!'); return; }
-  const ep = {
-    id: 'e' + Date.now(),
-    animeId: aid,
-    num: n,
-    title: document.getElementById('ep-t').value.trim(),
-    dur: document.getElementById('ep-d').value.trim(),
-    url: document.getElementById('ep-u').value.trim(),
-    createdAt: Date.now()
-  };
-  db.episodes.push(ep);
-  await saveEpisode(ep);
-  ['ep-n','ep-t','ep-d','ep-u'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('ep-sel').value = '';
-  const m = document.getElementById('ok-e'); m.style.display = 'block'; setTimeout(() => m.style.display = 'none', 3000);
+async function fsave(col, id, data) {
+  try { await setDoc(doc(fdb, col, id), data); showBadge(true, '✅ تم الحفظ'); }
+  catch(e) { showBadge(false, '❌ خطأ في الحفظ'); console.error(e); }
 }
-window.addEp = addEp;
+async function fdel(col, id) {
+  try { await deleteDoc(doc(fdb, col, id)); }
+  catch(e) { console.error(e); }
+}
 
-function renderAdmin() { refEpSel(); renderManage(); }
+// ---- TABS ----
+function goTab(tab, el) {
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+  const titles = {'dashboard':'الإحصائيات','add-anime':'إضافة أنمي','add-ep':'إضافة حلقة','manage-anime':'إدارة الأنمي','manage-eps':'إدارة الحلقات'};
+  document.getElementById('topbar-title').textContent = titles[tab] || '';
+  if (tab==='add-ep') refEpSel();
+  if (tab==='manage-anime') renderAnimeList();
+  if (tab==='manage-eps') refEpFilterSel();
+  if (tab==='dashboard') renderDashboard();
+}
+window.goTab = goTab;
 
-function renderManage() {
-  const el = document.getElementById('mlist');
-  if (!db.anime.length) { el.innerHTML = '<div class="empty"><div class="ei">📋</div><p>لا يوجد أنمي بعد</p></div>'; return; }
-  el.innerHTML = db.anime.map(a => {
-    const eps = db.episodes.filter(e => e.animeId === a.id).length;
+// ---- DASHBOARD ----
+function renderDashboard() {
+  document.getElementById('stat-anime').textContent = db.anime.length;
+  document.getElementById('stat-eps').textContent = db.episodes.length;
+  const top = [...db.anime].sort((a,b)=>(parseFloat(b.rating)||0)-(parseFloat(a.rating)||0))[0];
+  document.getElementById('stat-top').textContent = top ? top.rating : '—';
+  document.getElementById('stat-top-name').textContent = top ? (top.nameAr||top.nameEn) : 'لا يوجد بعد';
+  const recent = [...db.anime].reverse().slice(0,6);
+  const el = document.getElementById('recent-list');
+  if (!recent.length) { el.innerHTML = '<div class="empty-table"><div class="ei">🎌</div><p>لا يوجد أنمي بعد</p></div>'; return; }
+  el.innerHTML = recent.map(a => {
+    const eps = db.episodes.filter(e=>e.animeId===a.id).length;
     return `<div class="mitem">
-      <div class="mth">${a.img ? `<img src="${a.img}" alt="">` : `<div class="mth-ph">${a.emoji || '🎌'}</div>`}</div>
-      <div class="minfo"><h4>${a.nameAr || a.nameEn}</h4><p>${a.genre || ''} • ${eps} حلقة • ${a.status || ''}</p></div>
-      <button class="btn-del" onclick="delA('${a.id}')">🗑 حذف</button>
+      <div class="mth">${a.img?`<img src="${a.img}" alt="">`:`${a.emoji||'🎌'}`}</div>
+      <div class="minfo"><h4>${a.nameAr||a.nameEn}</h4><p>${a.genre||''} • ${eps} حلقة • ⭐ ${a.rating||'—'}</p></div>
     </div>`;
   }).join('');
 }
 
-async function delEp(id) {
-  if (!confirm('هل تريد حذف هذه الحلقة؟')) return;
-  db.episodes = db.episodes.filter(e => e.id !== id);
-  await deleteEpisodeDoc(id);
-  renderEpManage();
+// ---- ADD ANIME ----
+function onImgSel(inp) {
+  const f=inp.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{document.getElementById('a-imgd').value=e.target.result;const p=document.getElementById('up-prev');p.src=e.target.result;p.style.display='block';};
+  r.readAsDataURL(f);
 }
+function onDrop(e) {
+  e.preventDefault();
+  const f=e.dataTransfer.files[0]; if(!f||!f.type.startsWith('image/')) return;
+  const r=new FileReader();
+  r.onload=ev=>{document.getElementById('a-imgd').value=ev.target.result;const p=document.getElementById('up-prev');p.src=ev.target.result;p.style.display='block';};
+  r.readAsDataURL(f);
+}
+window.onImgSel=onImgSel; window.onDrop=onDrop;
 
+async function addAnime() {
+  const ar=document.getElementById('a-ar').value.trim(), en=document.getElementById('a-en').value.trim();
+  if(!ar&&!en){alert('أدخل اسم الأنمي!');return;}
+  const imgUrl=document.getElementById('a-imgurl').value.trim();
+  const imgBase64=document.getElementById('a-imgd').value;
+  const anime = {
+    id:'a'+Date.now(), nameAr:ar, nameEn:en,
+    genre:document.getElementById('a-genre').value,
+    rating:document.getElementById('a-rat').value,
+    year:document.getElementById('a-yr').value,
+    status:document.getElementById('a-st').value,
+    desc:document.getElementById('a-desc').value,
+    emoji:document.getElementById('a-emo').value||'🎌',
+    img:imgUrl||imgBase64||'', isNew:true, createdAt:Date.now()
+  };
+  db.anime.push(anime);
+  await fsave('anime', anime.id, anime);
+  ['a-ar','a-en','a-rat','a-yr','a-desc','a-emo','a-imgd','a-imgurl'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('up-prev').style.display='none';
+  document.getElementById('a-img').value='';
+  const m=document.getElementById('ok-a'); m.classList.add('show'); setTimeout(()=>m.classList.remove('show'),3000);
+  renderDashboard();
+}
+window.addAnime=addAnime;
+
+// ---- ADD EP ----
+function refEpSel() {
+  document.getElementById('ep-sel').innerHTML='<option value="">— اختر أنمي —</option>'+db.anime.map(a=>`<option value="${a.id}">${a.nameAr||a.nameEn}</option>`).join('');
+}
+async function addEp() {
+  const aid=document.getElementById('ep-sel').value; if(!aid){alert('اختر الأنمي!');return;}
+  const n=parseInt(document.getElementById('ep-n').value); if(!n){alert('أدخل رقم الحلقة!');return;}
+  const ep = {
+    id:'e'+Date.now(), animeId:aid, num:n,
+    title:document.getElementById('ep-t').value.trim(),
+    dur:document.getElementById('ep-d').value.trim(),
+    url:document.getElementById('ep-u').value.trim(),
+    createdAt:Date.now()
+  };
+  db.episodes.push(ep);
+  await fsave('episodes', ep.id, ep);
+  ['ep-n','ep-t','ep-d','ep-u'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ep-sel').value='';
+  const m=document.getElementById('ok-e'); m.classList.add('show'); setTimeout(()=>m.classList.remove('show'),3000);
+}
+window.addEp=addEp;
+
+// ---- MANAGE ANIME ----
+function renderAnimeList() {
+  const el=document.getElementById('anime-list');
+  document.getElementById('anime-count').textContent=db.anime.length+' أنمي';
+  if(!db.anime.length){el.innerHTML='<div class="empty-table"><div class="ei">🎌</div><p>لا يوجد أنمي بعد</p></div>';return;}
+  el.innerHTML=[...db.anime].reverse().map(a=>{
+    const eps=db.episodes.filter(e=>e.animeId===a.id).length;
+    return `<div class="mitem">
+      <div class="mth">${a.img?`<img src="${a.img}" alt="">`:`${a.emoji||'🎌'}`}</div>
+      <div class="minfo"><h4>${a.nameAr||a.nameEn}</h4><p>${a.genre||''} • ${eps} حلقة • ${a.status||''} • ⭐ ${a.rating||'—'}</p></div>
+      <div class="mactions"><button class="btn-del" onclick="delA('${a.id}')">🗑 حذف</button></div>
+    </div>`;
+  }).join('');
+}
 async function delA(id) {
-  if (!confirm('هل تريد حذف هذا الأنمي وجميع حلقاته؟')) return;
-  db.anime = db.anime.filter(a => a.id !== id);
-  const toDelete = db.episodes.filter(e => e.animeId === id);
-  db.episodes = db.episodes.filter(e => e.animeId !== id);
-  await deleteAnimeDoc(id);
-  await Promise.all(toDelete.map(ep => deleteEpisodeDoc(ep.id)));
-  renderManage();
+  if(!confirm('هل تريد حذف هذا الأنمي وجميع حلقاته؟')) return;
+  const toDelEps=db.episodes.filter(e=>e.animeId===id);
+  db.anime=db.anime.filter(a=>a.id!==id);
+  db.episodes=db.episodes.filter(e=>e.animeId!==id);
+  await fdel('anime',id);
+  await Promise.all(toDelEps.map(ep=>fdel('episodes',ep.id)));
+  renderAnimeList(); renderDashboard();
 }
-window.delEp = delEp;
-window.delA = delA;
-window.renderAdmin = renderAdmin;
-window.renderManage = renderManage;
+window.delA=delA;
 
-// ====== SECRET ADMIN — اكتب "animeku" فالكيبورد ======
-let secretBuffer = '';
-let secretClear;
-const SECRET_CODE = 'animeku';
-document.addEventListener('keydown', (e) => {
-  // شغال بس إذا مافيش input أو textarea مفوكس
-  if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
-  secretBuffer += e.key.toLowerCase();
-  clearTimeout(secretClear);
-  secretClear = setTimeout(() => { secretBuffer = ''; }, 2000);
-  if (secretBuffer.includes(SECRET_CODE)) {
-    secretBuffer = '';
-    showPage('admin-login');
-  }
-});
-
-// ====== START ======
-loadFromFirebase();
+// ---- MANAGE EPS ----
+function refEpFilterSel() {
+  document.getElementById('ep-filter-sel').innerHTML='<option value="">— اختر أنمي —</option>'+db.anime.map(a=>`<option value="${a.id}">${a.nameAr||a.nameEn}</option>`).join('');
+  document.getElementById('ep-list').innerHTML='<div class="empty-table"><div class="ei">📺</div><p>اختر أنمي لعرض حلقاته</p></div>';
+}
+function renderEpList() {
+  const aid=document.getElementById('ep-filter-sel').value;
+  const el=document.getElementById('ep-list');
+  if(!aid){el.innerHTML='<div class="empty-table"><div class="ei">📺</div><p>اختر أنمي لعرض حلقاته</p></div>';document.getElementById('ep-count-badge').textContent='0 حلقة';return;}
+  const eps=db.episodes.filter(e=>e.animeId===aid).sort((a,b)=>a.num-b.num);
+  document.getElementById('ep-count-badge').textContent=eps.length+' حلقة';
+  if(!eps.length){el.innerHTML='<div class="empty-table"><div class="ei">📺</div><p>لا توجد حلقات لهذا الأنمي</p></div>';return;}
+  el.innerHTML=eps.map(ep=>`<div class="mitem">
+    <div class="mth" style="font-size:16px;font-weight:800;color:var(--primary2)">${String(ep.num).padStart(2,'0')}</div>
+    <div class="minfo"><h4>${ep.title||'الحلقة '+ep.num}</h4><p>${ep.dur||''} ${ep.url?'• ✅ رابط موجود':'• ❌ لا يوجد رابط'}</p></div>
+    <div class="mactions"><button class="btn-del" onclick="delEp('${ep.id}')">🗑 حذف</button></div>
+  </div>`).join('');
+}
+async function delEp(id) {
+  if(!confirm('هل تريد حذف هذه الحلقة؟')) return;
+  db.episodes=db.episodes.filter(e=>e.id!==id);
+  await fdel('episodes',id);
+  renderEpList();
+}
+window.renderEpList=renderEpList; window.delEp=delEp;
 </script>
 </body>
 </html>
