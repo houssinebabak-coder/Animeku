@@ -237,7 +237,7 @@ img{display:block}
 </div>
 
 <nav class="nav">
-  <div class="logo" onclick="secretClick()">Anime<span>Ku</span></div>
+  <div class="logo" onclick="gotoHome()">Anime<span>Ku</span></div>
   <div class="nav-search">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <input type="text" id="search-input" placeholder="ابحث عن أنمي..." oninput="handleSearch(this.value)">
@@ -805,16 +805,21 @@ window.delA = delA;
 window.renderAdmin = renderAdmin;
 window.renderManage = renderManage;
 
-// ====== SECRET ADMIN ======
-let secretCount = 0, secretTimer;
-function secretClick() {
-  gotoHome();
-  secretCount++;
-  clearTimeout(secretTimer);
-  secretTimer = setTimeout(() => { secretCount = 0; }, 2000);
-  if (secretCount >= 5) { secretCount = 0; showPage('admin-login'); }
-}
-window.secretClick = secretClick;
+// ====== SECRET ADMIN — اكتب "animeku" فالكيبورد ======
+let secretBuffer = '';
+let secretClear;
+const SECRET_CODE = 'animeku';
+document.addEventListener('keydown', (e) => {
+  // شغال بس إذا مافيش input أو textarea مفوكس
+  if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+  secretBuffer += e.key.toLowerCase();
+  clearTimeout(secretClear);
+  secretClear = setTimeout(() => { secretBuffer = ''; }, 2000);
+  if (secretBuffer.includes(SECRET_CODE)) {
+    secretBuffer = '';
+    showPage('admin-login');
+  }
+});
 
 // ====== START ======
 loadFromFirebase();
