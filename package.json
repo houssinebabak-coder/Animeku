@@ -1,0 +1,22 @@
+{
+  "name": "animeku",
+  "version": "1.0.0",
+  "description": "AnimeKu - Anime streaming website with SQLite database",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js -e js,html,css,json"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^8.0.4",
+    "sql.js": "^1.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
