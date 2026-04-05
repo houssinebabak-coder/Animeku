@@ -216,7 +216,7 @@ img{display:block}
 <body>
 
 <nav class="nav">
-  <div class="logo" onclick="secretClick()">Anime<span>Ku</span></div>
+  <div class="logo" onclick="gotoHome()">Anime<span>Ku</span></div>
   <div class="nav-search">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <input type="text" id="search-input" placeholder="ابحث عن أنمي..." oninput="handleSearch(this.value)">
@@ -639,19 +639,13 @@ function delA(id){
 }
 renderHome();
 
-// SECRET ADMIN ACCESS
-let secretCount = 0;
-let secretTimer;
-function secretClick() {
-  gotoHome();
-  secretCount++;
-  clearTimeout(secretTimer);
-  secretTimer = setTimeout(() => { secretCount = 0; }, 2000);
-  if (secretCount >= 5) {
-    secretCount = 0;
+// KEYBOARD SHORTCUT: Ctrl + Shift + A
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+    e.preventDefault();
     showPage('admin-login');
   }
-}
+});
 </script>
 </body>
 </html>
